@@ -143,7 +143,7 @@ mod tests {
 
     /// Requires a live GCS bucket with Application Default Credentials
     /// configured, and `GCS_BUCKET` set. Run with:
-    /// `GCS_BUCKET=my-bucket cargo test -p corex-storage --features gcs -- --ignored`.
+    /// `GCS_BUCKET=my-bucket cargo test -p mytheclipse-storage --features gcs -- --ignored`.
     #[tokio::test]
     #[ignore = "requires a live GCS bucket + Application Default Credentials"]
     async fn put_get_roundtrip_live() {
@@ -151,15 +151,15 @@ mod tests {
         let storage = GcsStorage::connect(bucket).await.unwrap();
         storage
             .put(
-                "corex-storage-test.txt",
+                "mytheclipse-storage-test.txt",
                 bytes_stream(b"hello gcs".to_vec()),
             )
             .await
             .unwrap();
-        let data = read_to_vec(storage.get("corex-storage-test.txt").await.unwrap())
+        let data = read_to_vec(storage.get("mytheclipse-storage-test.txt").await.unwrap())
             .await
             .unwrap();
         assert_eq!(data, b"hello gcs");
-        storage.delete("corex-storage-test.txt").await.unwrap();
+        storage.delete("mytheclipse-storage-test.txt").await.unwrap();
     }
 }

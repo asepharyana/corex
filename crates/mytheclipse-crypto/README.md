@@ -1,4 +1,4 @@
-# corex-crypto
+# mytheclipse-crypto
 
 Safe, one-line security helpers that are easy to get wrong when hand-rolled:
 
@@ -20,7 +20,7 @@ independent.
 ## Usage
 
 ```rust
-use corex_crypto::{PasswordHasher, Encryptor, TokenSigner};
+use mytheclipse_crypto::{PasswordHasher, Encryptor, TokenSigner};
 
 let hasher = PasswordHasher::new();
 let hash = hasher.hash("letmein").unwrap();

@@ -1,12 +1,12 @@
 [package]
-name = "corex-crypto"
+name = "mytheclipse-crypto"
 version = "1.2.0"
 edition = "2021"
 rust-version = "1.75"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/asepharyana/mytheclipse"
 homepage = "https://github.com/asepharyana/mytheclipse"
-documentation = "https://docs.rs/corex-crypto"
+documentation = "https://docs.rs/mytheclipse-crypto"
 authors = ["asepharyana <superaseph@gmail.com>"]
 description = "Safe hashing, encryption, and token helpers (Argon2id, AES-256-GCM, JWT/Paseto) with key rotation support."
 readme = "README.md"

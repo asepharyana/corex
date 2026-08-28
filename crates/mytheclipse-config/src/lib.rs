@@ -1,4 +1,4 @@
-//! # corex-config
+//! # mytheclipse-config
 //!
 //! A type-safe, dynamic configuration engine: load environment variables,
 //! `.env` files, YAML, JSON, or TOML directly into a typed Rust struct, with
@@ -14,7 +14,7 @@
 //!
 //! ```no_run
 //! use serde::Deserialize;
-//! use corex_config::ConfigLoader;
+//! use mytheclipse_config::ConfigLoader;
 //!
 //! #[derive(Debug, Deserialize, Clone)]
 //! struct AppConfig {

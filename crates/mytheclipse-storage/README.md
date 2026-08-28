@@ -1,4 +1,4 @@
-# corex-storage
+# mytheclipse-storage
 
 A unified storage & file system abstraction so file handling isn't locked to
 one physical location.
@@ -14,7 +14,7 @@ requires holding it entirely in memory.
 ## Usage
 
 ```rust
-use corex_storage::{LocalFileStorage, StorageDriver, bytes_stream, read_to_vec};
+use mytheclipse_storage::{LocalFileStorage, StorageDriver, bytes_stream, read_to_vec};
 
 let storage = LocalFileStorage::new("/var/data");
 storage.put("uploads/report.csv", bytes_stream(data)).await?;

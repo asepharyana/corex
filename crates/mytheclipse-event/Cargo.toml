@@ -1,12 +1,12 @@
 [package]
-name = "corex-event"
+name = "mytheclipse-event"
 version = "1.2.0"
 edition = "2021"
 rust-version = "1.75"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/asepharyana/mytheclipse"
 homepage = "https://github.com/asepharyana/mytheclipse"
-documentation = "https://docs.rs/corex-event"
+documentation = "https://docs.rs/mytheclipse-event"
 authors = ["asepharyana <superaseph@gmail.com>"]
 description = "Unified events & message bus abstraction: in-memory pub/sub dispatcher plus pluggable distributed broker backends (RabbitMQ, NATS)."
 readme = "README.md"

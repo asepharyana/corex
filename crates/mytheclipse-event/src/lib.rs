@@ -1,4 +1,4 @@
-//! # corex-event
+//! # mytheclipse-event
 //!
 //! A unified events & message bus abstraction so component-to-component (or
 //! service-to-service) communication doesn't get locked to one transport.
@@ -16,7 +16,7 @@
 //! ## Example
 //!
 //! ```
-//! use corex_event::{EventBus, InMemoryEventBus, TypedEventBus};
+//! use mytheclipse_event::{EventBus, InMemoryEventBus, TypedEventBus};
 //! use serde::{Deserialize, Serialize};
 //!
 //! #[derive(Debug, Serialize, Deserialize, PartialEq)]

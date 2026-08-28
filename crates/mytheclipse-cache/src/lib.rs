@@ -1,4 +1,4 @@
-//! # corex-cache
+//! # mytheclipse-cache
 //!
 //! A unified multi-layer cache abstraction that keeps your application from
 //! being locked to any single cache provider.
@@ -18,7 +18,7 @@
 //! ## Example
 //!
 //! ```no_run
-//! use corex_cache::{Cache, MemoryCache, MultiLayerCache, CacheAside};
+//! use mytheclipse_cache::{Cache, MemoryCache, MultiLayerCache, CacheAside};
 //! # async fn run() {
 //! let l1 = MemoryCache::new();
 //! let l2 = MemoryCache::new(); // in a real app: a RedisCache

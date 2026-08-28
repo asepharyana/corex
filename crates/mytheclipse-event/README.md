@@ -1,4 +1,4 @@
-# corex-event
+# mytheclipse-event
 
 A unified events & message bus abstraction so component-to-component (or
 service-to-service) communication isn't locked to one transport.
@@ -19,7 +19,7 @@ service-to-service) communication isn't locked to one transport.
 ## Usage
 
 ```rust
-use corex_event::{InMemoryEventBus, TypedEventBus};
+use mytheclipse_event::{InMemoryEventBus, TypedEventBus};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]

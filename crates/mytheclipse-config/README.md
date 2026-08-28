@@ -1,4 +1,4 @@
-# corex-config
+# mytheclipse-config
 
 Type-safe, dynamic configuration: load `.env`, YAML, JSON, or TOML directly
 into a typed Rust struct, merge multiple sources with environment variables
@@ -14,7 +14,7 @@ taking priority, and optionally hot-reload when the source files change.
 
 ```rust
 use serde::Deserialize;
-use corex_config::ConfigLoader;
+use mytheclipse_config::ConfigLoader;
 
 #[derive(Debug, Deserialize, Clone)]
 struct AppConfig {
@@ -31,13 +31,13 @@ let config: AppConfig = ConfigLoader::new()
 ### Hot-reload
 
 ```rust
-use corex_config::DynamicConfig;
+use mytheclipse_config::DynamicConfig;
 # use serde::Deserialize;
 # #[derive(Debug, Deserialize, Clone)] struct AppConfig { port: u16 }
 
 let cfg = DynamicConfig::<AppConfig>::watch_files(
     vec!["config.yaml".into()],
-    || corex_config::ConfigLoader::new().merge_file("config.yaml".as_ref())?.build(),
+    || mytheclipse_config::ConfigLoader::new().merge_file("config.yaml".as_ref())?.build(),
 )?;
 
 let mut changes = cfg.subscribe();

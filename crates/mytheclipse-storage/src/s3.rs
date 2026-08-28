@@ -52,7 +52,7 @@ impl S3Storage {
         access_key: &str,
         secret_key: &str,
     ) -> Self {
-        let credentials = Credentials::new(access_key, secret_key, None, None, "corex-storage");
+        let credentials = Credentials::new(access_key, secret_key, None, None, "mytheclipse-storage");
         let config = aws_sdk_s3::Config::builder()
             .region(Region::new(region.to_string()))
             .endpoint_url(endpoint)
@@ -303,7 +303,7 @@ mod tests {
     /// Requires a live S3-compatible endpoint (e.g. MinIO) configured via
     /// `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`. Run with:
     /// `S3_ENDPOINT=http://127.0.0.1:9000 S3_BUCKET=test S3_ACCESS_KEY=... S3_SECRET_KEY=... \
-    ///   cargo test -p corex-storage --features s3 -- --ignored`.
+    ///   cargo test -p mytheclipse-storage --features s3 -- --ignored`.
     #[tokio::test]
     #[ignore = "requires a live S3-compatible endpoint (S3_ENDPOINT, S3_BUCKET, ...)"]
     async fn put_get_roundtrip_live() {
@@ -322,13 +322,13 @@ mod tests {
         .await;
 
         storage
-            .put("corex-storage-test.txt", bytes_stream(b"hello s3".to_vec()))
+            .put("mytheclipse-storage-test.txt", bytes_stream(b"hello s3".to_vec()))
             .await
             .unwrap();
-        let data = read_to_vec(storage.get("corex-storage-test.txt").await.unwrap())
+        let data = read_to_vec(storage.get("mytheclipse-storage-test.txt").await.unwrap())
             .await
             .unwrap();
         assert_eq!(data, b"hello s3");
-        storage.delete("corex-storage-test.txt").await.unwrap();
+        storage.delete("mytheclipse-storage-test.txt").await.unwrap();
     }
 }

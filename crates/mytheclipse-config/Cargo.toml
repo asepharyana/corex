@@ -1,12 +1,12 @@
 [package]
-name = "corex-config"
+name = "mytheclipse-config"
 version = "1.2.0"
 edition = "2021"
 rust-version = "1.75"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/asepharyana/mytheclipse"
 homepage = "https://github.com/asepharyana/mytheclipse"
-documentation = "https://docs.rs/corex-config"
+documentation = "https://docs.rs/mytheclipse-config"
 authors = ["asepharyana <superaseph@gmail.com>"]
 description = "Type-safe, dynamic configuration engine: load .env/YAML/JSON/TOML into typed structs with hot-reload and validation."
 readme = "README.md"

@@ -1,12 +1,12 @@
 [package]
-name = "corex-cache"
+name = "mytheclipse-cache"
 version = "1.2.0"
 edition = "2021"
 rust-version = "1.75"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/asepharyana/mytheclipse"
 homepage = "https://github.com/asepharyana/mytheclipse"
-documentation = "https://docs.rs/corex-cache"
+documentation = "https://docs.rs/mytheclipse-cache"
 authors = ["asepharyana <superaseph@gmail.com>"]
 description = "Unified multi-layer cache abstraction: L1/L2 caching, cache-aside and auto-refresh, with pluggable backends."
 readme = "README.md"

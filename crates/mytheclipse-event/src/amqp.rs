@@ -2,7 +2,7 @@
 //! AMQP 0.9.1 client.
 //!
 //! Topics map to routing keys on a single topic [`lapin::ExchangeKind::Topic`]
-//! exchange (default name `corex.events`); each subscription declares its own
+//! exchange (default name `mytheclipse.events`); each subscription declares its own
 //! exclusive, auto-delete queue bound to that routing key, matching the
 //! common "fanout via topic exchange" pattern.
 
@@ -107,7 +107,7 @@ impl EventBus for AmqpEventBus {
             .channel
             .basic_consume(
                 queue.name().as_str(),
-                "corex-event-consumer",
+                "mytheclipse-event-consumer",
                 BasicConsumeOptions::default(),
                 FieldTable::default(),
             )
@@ -145,12 +145,12 @@ mod tests {
 
     /// Requires a live RabbitMQ at `AMQP_URL` (e.g.
     /// `amqp://guest:guest@127.0.0.1:5672/%2f`). Run with:
-    /// `AMQP_URL=... cargo test -p corex-event --features amqp -- --ignored`.
+    /// `AMQP_URL=... cargo test -p mytheclipse-event --features amqp -- --ignored`.
     #[tokio::test]
     #[ignore = "requires a live RabbitMQ instance (AMQP_URL)"]
     async fn publish_subscribe_roundtrip_live() {
         let url = std::env::var("AMQP_URL").expect("set AMQP_URL");
-        let bus = AmqpEventBus::connect(&url, "corex_event_test")
+        let bus = AmqpEventBus::connect(&url, "mytheclipse_event_test")
             .await
             .unwrap();
         let mut sub = bus.subscribe("orders.created").await.unwrap();

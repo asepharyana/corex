@@ -30,7 +30,7 @@ jobs:
       # between publishes avoids hitting crates.io's rate limit.
       - name: Publish workspace crates
         run: |
-          for crate in mytheclipse corex-cache corex-storage corex-event corex-config corex-crypto; do
+          for crate in mytheclipse mytheclipse-cache mytheclipse-storage mytheclipse-event mytheclipse-config mytheclipse-crypto; do
             echo "Publishing $crate..."
             cargo publish -p "$crate" --allow-dirty --no-verify
             sleep 15

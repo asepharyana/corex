@@ -1,4 +1,4 @@
-# corex-cache
+# mytheclipse-cache
 
 A unified multi-layer cache abstraction so your app isn't locked to one cache
 provider. Combines an in-process **L1** cache with a distributed **L2** cache
@@ -15,7 +15,7 @@ provider. Combines an in-process **L1** cache with a distributed **L2** cache
 ## Usage
 
 ```rust
-use corex_cache::{Cache, MemoryCache, MultiLayerCache, CacheAside};
+use mytheclipse_cache::{Cache, MemoryCache, MultiLayerCache, CacheAside};
 
 let cache = MultiLayerCache::new(
     MemoryCache::new(),          // L1

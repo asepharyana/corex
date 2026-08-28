@@ -1,12 +1,12 @@
 [package]
-name = "corex-storage"
+name = "mytheclipse-storage"
 version = "1.2.0"
 edition = "2021"
 rust-version = "1.75"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/asepharyana/mytheclipse"
 homepage = "https://github.com/asepharyana/mytheclipse"
-documentation = "https://docs.rs/corex-storage"
+documentation = "https://docs.rs/mytheclipse-storage"
 authors = ["asepharyana <superaseph@gmail.com>"]
 description = "Unified storage & file system abstraction: one driver interface over Local Disk, S3/MinIO, and Google Cloud Storage, with stream-based upload/download."
 readme = "README.md"

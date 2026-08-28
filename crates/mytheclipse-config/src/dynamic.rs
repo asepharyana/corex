@@ -43,13 +43,13 @@ impl<T: Config + Clone> DynamicConfig<T> {
     pub fn get(&self) -> T {
         self.inner
             .read()
-            .expect("corex-config: RwLock poisoned")
+            .expect("mytheclipse-config: RwLock poisoned")
             .clone()
     }
 
     /// Replaces the current value and notifies subscribers.
     pub fn set(&self, new: T) {
-        *self.inner.write().expect("corex-config: RwLock poisoned") = new;
+        *self.inner.write().expect("mytheclipse-config: RwLock poisoned") = new;
         let _ = self.tx.send(());
     }
 
@@ -101,7 +101,7 @@ impl<T: Config + Clone> DynamicConfig<T> {
         }
 
         std::thread::Builder::new()
-            .name("corex-config-watch".into())
+            .name("mytheclipse-config-watch".into())
             .spawn(move || {
                 // Keep the watcher alive for the life of this thread.
                 let _watcher = watcher;
@@ -115,12 +115,12 @@ impl<T: Config + Clone> DynamicConfig<T> {
                     }
                     match reload() {
                         Ok(new) => {
-                            *inner.write().expect("corex-config: RwLock poisoned") = new;
+                            *inner.write().expect("mytheclipse-config: RwLock poisoned") = new;
                             let _ = tx.send(());
                             last_applied = Instant::now();
                         }
                         Err(e) => {
-                            tracing::error!("corex-config: hot-reload failed: {e}");
+                            tracing::error!("mytheclipse-config: hot-reload failed: {e}");
                         }
                     }
                 }

@@ -60,33 +60,33 @@ jobs:
             flags: "-p mytheclipse --no-default-features --features lifecycle"
           - name: mytheclipse / observability only
             flags: "-p mytheclipse --no-default-features --features observability"
-          # corex-cache
-          - name: corex-cache / default
-            flags: "-p corex-cache"
-          - name: corex-cache / l1-moka
-            flags: "-p corex-cache --no-default-features --features l1-moka"
-          - name: corex-cache / l2-redis
-            flags: "-p corex-cache --no-default-features --features l1-memory,l2-redis"
-          # corex-storage
-          - name: corex-storage / default (local)
-            flags: "-p corex-storage"
-          - name: corex-storage / s3
-            flags: "-p corex-storage --no-default-features --features s3"
-          - name: corex-storage / gcs
-            flags: "-p corex-storage --no-default-features --features gcs"
-          # corex-event
-          - name: corex-event / default (mem)
-            flags: "-p corex-event"
-          - name: corex-event / amqp
-            flags: "-p corex-event --no-default-features --features amqp"
-          - name: corex-event / nats
-            flags: "-p corex-event --no-default-features --features nats"
-          # corex-config
-          - name: corex-config / default
-            flags: "-p corex-config"
-          # corex-crypto
-          - name: corex-crypto / default
-            flags: "-p corex-crypto"
+          # mytheclipse-cache
+          - name: mytheclipse-cache / default
+            flags: "-p mytheclipse-cache"
+          - name: mytheclipse-cache / l1-moka
+            flags: "-p mytheclipse-cache --no-default-features --features l1-moka"
+          - name: mytheclipse-cache / l2-redis
+            flags: "-p mytheclipse-cache --no-default-features --features l1-memory,l2-redis"
+          # mytheclipse-storage
+          - name: mytheclipse-storage / default (local)
+            flags: "-p mytheclipse-storage"
+          - name: mytheclipse-storage / s3
+            flags: "-p mytheclipse-storage --no-default-features --features s3"
+          - name: mytheclipse-storage / gcs
+            flags: "-p mytheclipse-storage --no-default-features --features gcs"
+          # mytheclipse-event
+          - name: mytheclipse-event / default (mem)
+            flags: "-p mytheclipse-event"
+          - name: mytheclipse-event / amqp
+            flags: "-p mytheclipse-event --no-default-features --features amqp"
+          - name: mytheclipse-event / nats
+            flags: "-p mytheclipse-event --no-default-features --features nats"
+          # mytheclipse-config
+          - name: mytheclipse-config / default
+            flags: "-p mytheclipse-config"
+          # mytheclipse-crypto
+          - name: mytheclipse-crypto / default
+            flags: "-p mytheclipse-crypto"
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -118,7 +118,7 @@ jobs:
       fail-fast: false
       matrix:
         crate:
-          [mytheclipse, corex-cache, corex-storage, corex-event, corex-config, corex-crypto]
+          [mytheclipse, mytheclipse-cache, mytheclipse-storage, mytheclipse-event, mytheclipse-config, mytheclipse-crypto]
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable

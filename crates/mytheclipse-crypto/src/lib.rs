@@ -1,4 +1,4 @@
-//! # corex-crypto
+//! # mytheclipse-crypto
 //!
 //! Low-level security helpers that are easy to get wrong when hand-rolled:
 //!
@@ -18,7 +18,7 @@
 //! ## Example
 //!
 //! ```no_run
-//! use corex_crypto::{PasswordHasher, Encryptor, TokenSigner};
+//! use mytheclipse_crypto::{PasswordHasher, Encryptor, TokenSigner};
 //!
 //! // Hash & verify a password.
 //! let hasher = PasswordHasher::new();
@@ -63,7 +63,7 @@ pub use token::{Claims, TokenError, TokenSigner};
 
 pub use key_ring::KeyRing;
 
-/// Errors returned across corex-crypto primitives.
+/// Errors returned across mytheclipse-crypto primitives.
 #[non_exhaustive]
 #[derive(Debug)]
 pub enum CryptoError {

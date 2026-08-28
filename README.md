@@ -12,11 +12,11 @@ concern.
 | Crate | Description | Docs |
 | :--- | :--- | :--- |
 | [`mytheclipse`](crates/mytheclipse) | Resource-aware execution primitives (async I/O, compute, background queues), resiliency (retry, circuit breaker, timeout), traffic control (rate limiter, backpressure, concurrency limiter), lifecycle (graceful shutdown, cron), and observability (metrics, panic tracking). | [README](crates/mytheclipse/README.md) |
-| [`corex-cache`](crates/corex-cache) | Unified multi-layer (L1/L2) cache abstraction: in-memory or Moka L1, Redis/Valkey L2, cache-aside read-through. | [README](crates/corex-cache/README.md) |
-| [`corex-storage`](crates/corex-storage) | Unified storage & file system abstraction: one driver interface over local disk, S3/MinIO, and Google Cloud Storage, stream-based. | [README](crates/corex-storage/README.md) |
-| [`corex-event`](crates/corex-event) | Unified events & message bus abstraction: in-memory pub/sub dispatcher plus RabbitMQ and NATS broker adapters behind one trait. | [README](crates/corex-event/README.md) |
-| [`corex-config`](crates/corex-config) | Type-safe, dynamic configuration engine: load `.env`/YAML/JSON/TOML into typed structs, with hot-reload. | [README](crates/corex-config/README.md) |
-| [`corex-crypto`](crates/corex-crypto) | Safe hashing (Argon2id), encryption (AES-256-GCM), and JWT tokens, with key rotation support. | [README](crates/corex-crypto/README.md) |
+| [`mytheclipse-cache`](crates/mytheclipse-cache) | Unified multi-layer (L1/L2) cache abstraction: in-memory or Moka L1, Redis/Valkey L2, cache-aside read-through. | [README](crates/mytheclipse-cache/README.md) |
+| [`mytheclipse-storage`](crates/mytheclipse-storage) | Unified storage & file system abstraction: one driver interface over local disk, S3/MinIO, and Google Cloud Storage, stream-based. | [README](crates/mytheclipse-storage/README.md) |
+| [`mytheclipse-event`](crates/mytheclipse-event) | Unified events & message bus abstraction: in-memory pub/sub dispatcher plus RabbitMQ and NATS broker adapters behind one trait. | [README](crates/mytheclipse-event/README.md) |
+| [`mytheclipse-config`](crates/mytheclipse-config) | Type-safe, dynamic configuration engine: load `.env`/YAML/JSON/TOML into typed structs, with hot-reload. | [README](crates/mytheclipse-config/README.md) |
+| [`mytheclipse-crypto`](crates/mytheclipse-crypto) | Safe hashing (Argon2id), encryption (AES-256-GCM), and JWT tokens, with key rotation support. | [README](crates/mytheclipse-crypto/README.md) |
 
 Every crate follows the same philosophy: **one small interface, pluggable
 backends behind feature flags, and a working default that needs no external
@@ -31,11 +31,11 @@ Each crate is published independently; add the ones you need:
 ```toml
 [dependencies]
 mytheclipse = { version = "1", features = ["full"] }
-corex-cache = "0.1"
-corex-storage = { version = "0.1", features = ["s3"] }
-corex-event = { version = "0.1", features = ["nats"] }
-corex-config = "0.1"
-corex-crypto = "0.1"
+mytheclipse-cache = "0.1"
+mytheclipse-storage = { version = "0.1", features = ["s3"] }
+mytheclipse-event = { version = "0.1", features = ["nats"] }
+mytheclipse-config = "0.1"
+mytheclipse-crypto = "0.1"
 ```
 
 See each crate's own README (linked above) for usage examples and the full
@@ -52,7 +52,7 @@ cargo clippy --workspace --all-features -- -D warnings
 cargo fmt --all --check
 ```
 
-Or target a single crate with `-p <name>`, e.g. `cargo test -p corex-cache`.
+Or target a single crate with `-p <name>`, e.g. `cargo test -p mytheclipse-cache`.
 
 ## License
 

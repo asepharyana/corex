@@ -77,7 +77,7 @@ mod tests {
     use super::*;
 
     /// Requires a live NATS server at `NATS_URL` (e.g. `nats://127.0.0.1:4222`).
-    /// Run with: `NATS_URL=... cargo test -p corex-event --features nats -- --ignored`.
+    /// Run with: `NATS_URL=... cargo test -p mytheclipse-event --features nats -- --ignored`.
     #[tokio::test]
     #[ignore = "requires a live NATS instance (NATS_URL)"]
     async fn publish_subscribe_roundtrip_live() {

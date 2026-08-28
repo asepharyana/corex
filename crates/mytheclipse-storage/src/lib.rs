@@ -1,4 +1,4 @@
-//! # corex-storage
+//! # mytheclipse-storage
 //!
 //! A unified storage & file system abstraction so file handling doesn't get
 //! locked to one physical storage location.
@@ -16,7 +16,7 @@
 //! ## Example
 //!
 //! ```
-//! use corex_storage::{LocalFileStorage, StorageDriver, bytes_stream, read_to_vec};
+//! use mytheclipse_storage::{LocalFileStorage, StorageDriver, bytes_stream, read_to_vec};
 //! # #[tokio::main] async fn main() {
 //! # let dir = tempfile::tempdir().unwrap();
 //! let storage = LocalFileStorage::new(dir.path());

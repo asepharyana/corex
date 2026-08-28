@@ -1,4 +1,4 @@
-//! Shared error type for corex-config.
+//! Shared error type for mytheclipse-config.
 
 /// Errors surfaced while loading or reloading configuration.
 #[non_exhaustive]

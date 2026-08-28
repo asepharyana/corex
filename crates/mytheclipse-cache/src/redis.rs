@@ -101,7 +101,7 @@ mod tests {
 
     /// Integration test requiring a live Redis at `REDIS_URL`
     /// (e.g. `redis://127.0.0.1:6379`). Run with:
-    /// `REDIS_URL=redis://127.0.0.1:6379 cargo test -p corex-cache --features l2-redis -- --ignored` .
+    /// `REDIS_URL=redis://127.0.0.1:6379 cargo test -p mytheclipse-cache --features l2-redis -- --ignored` .
     #[tokio::test]
     #[ignore = "requires a live Redis instance (REDIS_URL)"]
     async fn set_get_roundtrip_live() {
@@ -111,7 +111,7 @@ mod tests {
             .get_multiplexed_tokio_connection()
             .await
             .expect("connect");
-        let cache = RedisCache::with_prefix(conn, "corex_cache_test:".to_string());
+        let cache = RedisCache::with_prefix(conn, "mytheclipse_cache_test:".to_string());
 
         cache
             .set("k", b"v".to_vec(), Some(Duration::from_secs(3600)))
