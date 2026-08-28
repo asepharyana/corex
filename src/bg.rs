@@ -30,8 +30,8 @@ where
         .bg_semaphore
         .acquire()
         .await
-        .expect("corex: bg semaphore closed unexpectedly");
-    let span = tracing::info_span!("corex_bg_task");
+        .expect("mytheclipse: bg semaphore closed unexpectedly");
+    let span = tracing::info_span!("mytheclipse_bg_task");
     tokio::spawn(
         async move {
             let _permit = permit;

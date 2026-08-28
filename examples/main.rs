@@ -1,30 +1,30 @@
-//! Demonstrates `corex`'s three execution primitives end to end, including
+//! Demonstrates `mytheclipse`'s three execution primitives end to end, including
 //! automatic recovery from a panicking compute closure.
 
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
 
-    let ctx = corex::init();
+    let ctx = mytheclipse::init();
     println!(
         "engine context: io_threads={} compute_threads={} bg_concurrency={}",
         ctx.io_threads, ctx.compute_threads, ctx.bg_concurrency
     );
 
-    let io_handle = corex::spawn_io(async {
+    let io_handle = mytheclipse::spawn_io(async {
         tokio::time::sleep(std::time::Duration::from_millis(50)).await;
         42u64
     });
 
-    let sum_result = corex::compute(|| (1..=1_000u64).sum::<u64>());
+    let sum_result = mytheclipse::compute(|| (1..=1_000u64).sum::<u64>());
 
-    let panic_result: Result<u64, corex::CorexError> = corex::compute(|| {
+    let panic_result: Result<u64, mytheclipse::CorexError> = mytheclipse::compute(|| {
         panic!("intentional panic to demonstrate isolation");
     });
 
-    let recovery_result = corex::compute(|| 2u64 + 2u64);
+    let recovery_result = mytheclipse::compute(|| 2u64 + 2u64);
 
-    let bg_handle = corex::spawn_bg(async {
+    let bg_handle = mytheclipse::spawn_bg(async {
         tokio::time::sleep(std::time::Duration::from_millis(10)).await;
         "bg-task-done"
     })

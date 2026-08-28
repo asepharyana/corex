@@ -1,6 +1,6 @@
-//! Shared error type for corex execution primitives.
+//! Shared error type for mytheclipse execution primitives.
 
-/// Errors surfaced by corex's panic-isolated execution primitives.
+/// Errors surfaced by mytheclipse's panic-isolated execution primitives.
 ///
 /// Marked `#[non_exhaustive]` so new variants can be added without a
 /// breaking change; downstream `match` expressions should include a

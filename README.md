@@ -1,7 +1,7 @@
-# corex
+# mytheclipse
 
-[![Crates.io](https://img.shields.io/crates/v/corex.svg)](https://crates.io/crates/corex)
-[![Documentation](https://docs.rs/corex/badge.svg)](https://docs.rs/corex)
+[![Crates.io](https://img.shields.io/crates/v/mytheclipse.svg)](https://crates.io/crates/mytheclipse)
+[![Documentation](https://docs.rs/mytheclipse/badge.svg)](https://docs.rs/mytheclipse)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE-MIT)
 
 Resource-aware execution primitives for Rust: async I/O, heavy compute, and background queue management, sized automatically from the host's logical core count and exposed through a single, lazily-initialized engine context.
@@ -18,9 +18,9 @@ Given $N$ logical cores (via `num_cpus::get()`):
 
 ## Features
 
-- **`io`**: enables `corex::spawn_io`, instrumented async task spawning.
-- **`compute`**: enables `corex::compute`, panic-isolated execution on a sized Rayon pool.
-- **`bg`**: enables `corex::spawn_bg`, semaphore-bounded background tasks.
+- **`io`**: enables `mytheclipse::spawn_io`, instrumented async task spawning.
+- **`compute`**: enables `mytheclipse::compute`, panic-isolated execution on a sized Rayon pool.
+- **`bg`**: enables `mytheclipse::spawn_bg`, semaphore-bounded background tasks.
 - **`full`**: enables all three subsystems.
 
 Zero features enabled by default (`default = []`), so you only pull in the dependencies your application actually uses.
@@ -31,7 +31,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-corex = { version = "0.1", features = ["full"] }
+mytheclipse = { version = "0.1", features = ["full"] }
 ```
 
 Use the entry points directly:
@@ -41,23 +41,23 @@ Use the entry points directly:
 async fn main() {
     // Optional explicit bootstrap: logs or validates resource sizing upfront.
     // Omit it and the first call to any primitive below will initialize it lazily.
-    let ctx = corex::init();
+    let ctx = mytheclipse::init();
     println!(
         "io_threads={} compute_threads={} bg_concurrency={}",
         ctx.io_threads, ctx.compute_threads, ctx.bg_concurrency
     );
 
     // 1. Async I/O (instrumented with tracing)
-    let io = corex::spawn_io(async {
+    let io = mytheclipse::spawn_io(async {
         // ... network / disk work ...
         42
     });
 
     // 2. Heavy Compute (isolated from worker panics)
-    let sum = corex::compute(|| (1..=1_000_000u64).sum::<u64>())?;
+    let sum = mytheclipse::compute(|| (1..=1_000_000u64).sum::<u64>())?;
 
     // 3. Background Queue (concurrency-bounded)
-    let bg = corex::spawn_bg(async {
+    let bg = mytheclipse::spawn_bg(async {
         // ... deferred cleanup / telemetry ...
     }).await;
 

@@ -1,11 +1,5 @@
 # Cargo build artifacts
 /target
-/crates/*/target
-
-# corex is a library workspace: the lockfile is not committed, per Rust's
-# convention for libraries (binaries/applications should commit theirs).
-# Cargo regenerates it locally and in CI on every build.
-Cargo.lock
 
 # Editor / OS noise
 .DS_Store

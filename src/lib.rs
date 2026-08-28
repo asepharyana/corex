@@ -1,4 +1,4 @@
-//! # corex
+//! # mytheclipse
 //!
 //! Resource-aware abstractions for async I/O, heavy compute, and
 //! background queue management, built on a single lazily-initialized
@@ -14,26 +14,39 @@
 //!
 //! Enable the `full` feature to pull in all three at once.
 
-pub use corex_core::context::{context, EngineContext};
-
+pub mod context;
 #[cfg(feature = "compute")]
-pub use corex_core::error::CorexError;
+pub mod error;
 
 #[cfg(feature = "io")]
-pub use corex_core::io::spawn_io;
+pub mod io;
 
 #[cfg(feature = "compute")]
-pub use corex_core::compute::compute;
+pub mod compute;
 
 #[cfg(feature = "bg")]
-pub use corex_core::bg::spawn_bg;
+pub mod bg;
 
-/// Bootstraps the global corex [`EngineContext`].
+pub use context::{context, EngineContext};
+
+#[cfg(feature = "compute")]
+pub use error::CorexError;
+
+#[cfg(feature = "io")]
+pub use io::spawn_io;
+
+#[cfg(feature = "compute")]
+pub use compute::compute;
+
+#[cfg(feature = "bg")]
+pub use bg::spawn_bg;
+
+/// Bootstraps the global [`EngineContext`].
 ///
-/// See [`corex_core::context::init`] for full semantics: this is safe to
-/// call any number of times, from any thread, and is equivalent to letting
-/// the first call to [`spawn_io`], [`compute`], or [`spawn_bg`] trigger
+/// See [`context::init`] for full semantics: this is safe to call any
+/// number of times, from any thread, and is equivalent to letting the
+/// first call to [`spawn_io`], [`compute`], or [`spawn_bg`] trigger
 /// initialization implicitly.
 pub fn init() -> &'static EngineContext {
-    corex_core::context::init()
+    context::init()
 }

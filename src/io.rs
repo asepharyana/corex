@@ -3,11 +3,11 @@
 use tracing::Instrument;
 
 /// Spawns `future` onto the ambient Tokio runtime, wrapped in a
-/// `corex_io_task` tracing span.
+/// `mytheclipse_io_task` tracing span.
 ///
 /// # Panics
 ///
-/// Panics if called outside the context of a running Tokio runtime; corex
+/// Panics if called outside the context of a running Tokio runtime; mytheclipse
 /// does not construct or own a runtime of its own, it schedules onto
 /// whichever runtime the caller is already inside.
 pub fn spawn_io<F>(future: F) -> tokio::task::JoinHandle<F::Output>
@@ -15,7 +15,7 @@ where
     F: std::future::Future + Send + 'static,
     F::Output: Send + 'static,
 {
-    let span = tracing::info_span!("corex_io_task");
+    let span = tracing::info_span!("mytheclipse_io_task");
     tokio::spawn(future.instrument(span))
 }
 

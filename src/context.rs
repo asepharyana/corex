@@ -10,7 +10,7 @@ static CONTEXT: OnceLock<EngineContext> = OnceLock::new();
 
 /// The global, lazily-initialized engine context.
 ///
-/// Holds the computed thread and concurrency counts for each corex
+/// Holds the computed thread and concurrency counts for each mytheclipse
 /// subsystem, along with the resource pools those counts were used to
 /// build. The context lives for the lifetime of the process once
 /// initialized: it is stored in a `'static` [`OnceLock`] and is never
@@ -46,9 +46,9 @@ impl EngineContext {
         #[cfg(feature = "compute")]
         let compute_pool = rayon::ThreadPoolBuilder::new()
             .num_threads(compute_threads)
-            .thread_name(|index| format!("corex-compute-{index}"))
+            .thread_name(|index| format!("mytheclipse-compute-{index}"))
             .build()
-            .expect("corex: failed to build rayon compute thread pool");
+            .expect("mytheclipse: failed to build rayon compute thread pool");
 
         #[cfg(feature = "bg")]
         let bg_semaphore = tokio::sync::Semaphore::new(bg_concurrency);
