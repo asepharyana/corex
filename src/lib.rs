@@ -9,7 +9,7 @@
 //! feature-gated entry points your workload needs:
 //!
 //! - [`spawn_io`] (feature `io`) — spawn an async I/O task, tracing-instrumented.
-//! - [`compute`] (feature `compute`) — run CPU-bound work on a sized Rayon pool, panic-isolated.
+//! - [`compute()`] (feature `compute`) — run CPU-bound work on a sized Rayon pool, panic-isolated.
 //! - [`spawn_bg`] (feature `bg`) — spawn a background task under bounded concurrency.
 //!
 //! Enable the `full` feature to pull in all three at once.
@@ -45,7 +45,7 @@ pub use bg::spawn_bg;
 ///
 /// See [`context::init`] for full semantics: this is safe to call any
 /// number of times, from any thread, and is equivalent to letting the
-/// first call to [`spawn_io`], [`compute`], or [`spawn_bg`] trigger
+/// first call to [`spawn_io`], [`compute()`], or [`spawn_bg`] trigger
 /// initialization implicitly.
 pub fn init() -> &'static EngineContext {
     context::init()
