@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/asepharyana/mytheclipse/compare/v1.0.0...v1.1.0) (2026-08-28)
+
+
+### Features
+
+* add panic tracking and isolation with PanicTracker ([8dec413](https://github.com/asepharyana/mytheclipse/commit/8dec4130057420320500d7a9265ccb3cbfd0e030))
+
 # [1.0.0](https://github.com/asepharyana/mytheclipse/compare/v0.2.4...v1.0.0) (2026-08-28)
 
 
