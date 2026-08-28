@@ -3,6 +3,15 @@ name: Publish to crates.io
 on:
   push:
     tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Git tag to publish (e.g. v0.2.0). Defaults to latest tag."
+        required: false
+        type: string
+
+permissions:
+  contents: read
 
 jobs:
   publish:
@@ -10,7 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.event.ref || github.ref }}
+          fetch-depth: 0
+
       - uses: dtolnay/rust-toolchain@stable
+
       - name: Publish mytheclipse
         run: cargo publish --allow-dirty --no-verify
         env:

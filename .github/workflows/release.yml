@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+
+      - name: Install semantic-release
+        run: |
+          npm install -D \
+            semantic-release \
+            @semantic-release/exec \
+            @semantic-release/git \
+            @semantic-release/changelog \
+            @semantic-release/github
+
+      - name: Run semantic-release
+        id: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+      - name: Trigger crate publish
+        if: ${{ steps.semantic-release.outputs.new_release_published == 'true' }}
+        env:
+          RELEASE_VERSION: ${{ steps.semantic-release.outputs.next_release_version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${RELEASE_VERSION}"
+          echo "Tagging and dispatching publish for $TAG"
+          gh workflow run publish.yml --ref main -f tag="$TAG"
