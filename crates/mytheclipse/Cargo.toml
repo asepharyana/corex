@@ -1,0 +1,45 @@
+[package]
+name = "mytheclipse"
+version = "1.0.0"
+edition = "2021"
+rust-version = "1.75"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/asepharyana/mytheclipse"
+homepage = "https://github.com/asepharyana/mytheclipse"
+documentation = "https://docs.rs/mytheclipse"
+authors = ["asepharyana <superaseph@gmail.com>"]
+description = "Resource-aware abstractions for async I/O, heavy compute, background queue management, resiliency, traffic control, lifecycle, and observability."
+readme = "README.md"
+keywords = ["async", "concurrency", "rayon", "tokio", "resource-management", "resiliency", "retry", "circuit-breaker", "rate-limit", "observability", "cron", "shutdown"]
+categories = ["asynchronous", "concurrency", "rust-patterns"]
+
+[dependencies]
+tokio = { version = "1.53", features = ["full"], optional = true }
+rayon = { version = "1.12", optional = true }
+rand = { version = "0.8", optional = true }
+num_cpus = "1.17"
+tracing = "0.1"
+
+[dev-dependencies]
+tokio = { version = "1.53", features = ["full"] }
+tracing-subscriber = "0.3"
+
+[features]
+default = []
+io = ["dep:tokio"]
+compute = ["dep:rayon"]
+bg = ["dep:tokio"]
+resiliency = ["dep:tokio", "dep:rand"]
+traffic = ["dep:tokio"]
+lifecycle = ["dep:tokio"]
+observability = ["dep:tokio"]
+full = ["io", "compute", "bg", "resiliency", "traffic", "lifecycle", "observability"]
+
+[[example]]
+name = "main"
+path = "examples/main.rs"
+required-features = ["full"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

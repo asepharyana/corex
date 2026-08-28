@@ -25,7 +25,15 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
-      - name: Publish mytheclipse
-        run: cargo publish --allow-dirty --no-verify
+      # The workspace crates have no interdependencies, so publish order
+      # doesn't matter for crates.io dependency resolution. A brief sleep
+      # between publishes avoids hitting crates.io's rate limit.
+      - name: Publish workspace crates
+        run: |
+          for crate in mytheclipse corex-cache corex-storage corex-event corex-config corex-crypto; do
+            echo "Publishing $crate..."
+            cargo publish -p "$crate" --allow-dirty --no-verify
+            sleep 15
+          done
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}

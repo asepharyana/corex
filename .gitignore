@@ -1,5 +1,6 @@
-# Cargo build artifacts
+# Cargo build artifacts (workspace root and any nested crate target dirs)
 /target
+target/
 
 # Editor / OS noise
 .DS_Store
