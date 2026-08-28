@@ -10,7 +10,7 @@ documentation = "https://docs.rs/mytheclipse"
 authors = ["asepharyana <superaseph@gmail.com>"]
 description = "Resource-aware abstractions for async I/O, heavy compute, background queue management, resiliency, traffic control, lifecycle, and observability."
 readme = "README.md"
-keywords = ["async", "concurrency", "rayon", "tokio", "resource-management", "resiliency", "retry", "circuit-breaker", "rate-limit", "observability", "cron", "shutdown"]
+keywords = ["async", "concurrency", "resiliency", "circuit-breaker", "observability"]
 categories = ["asynchronous", "concurrency", "rust-patterns"]
 
 [dependencies]
