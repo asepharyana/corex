@@ -1,3 +1,10 @@
+## [0.2.4](https://github.com/asepharyana/corex/compare/v0.2.3...v0.2.4) (2026-08-28)
+
+
+### Bug Fixes
+
+* **release:** add actions: write permission for workflow dispatch ([5684938](https://github.com/asepharyana/corex/commit/5684938b4cd5a133a57ee835426035a804edcb38))
+
 ## [0.2.3](https://github.com/asepharyana/corex/compare/v0.2.2...v0.2.3) (2026-08-28)
 
 
