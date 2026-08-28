@@ -69,8 +69,18 @@ impl Cache for RedisCache {
         let k = self.key(key);
         match ttl {
             Some(ttl) => {
-                let secs = ttl.as_secs().max(1);
-                let result: Result<(), RedisError> = c.set_ex(&k, value, secs).await;
+                // Use millisecond precision (PSETEX) so sub-second TTLs are
+                // honored faithfully. Previously `set_ex(seconds.max(1))`
+                // rounded anything < 1s up to 1s, silently changing expiry
+                // semantics for short-lived cache entries.
+                let ms = ttl.as_millis();
+                if ms == 0 {
+                    return Err(CacheError::Key(
+                        "ttl of 0ms not allowed — pass None to store permanently".into(),
+                    ));
+                }
+                let ms = ms as u64;
+                let result: Result<(), RedisError> = c.pset_ex(&k, value, ms).await;
                 result.map_err(map_err)
             }
             None => {
@@ -88,9 +98,13 @@ impl Cache for RedisCache {
     }
 
     async fn clear(&self) -> Result<(), CacheError> {
-        // Deliberately does nothing: `FLUSHALL`/`FLUSHDB` are dangerous on a
-        // shared instance. Consumers should scope keys under a prefix and call
-        // `invalidate` for the keys they own.
+        // Deliberately does nothing: a blind `FLUSHDB`/`FLUSHALL` on a shared
+        // Redis instance would destroy keys owned by other consumers.
+        // Consumers that need a true wipe must either (a) use a dedicated Redis
+        // DB / namespace prefix they own exclusively, or (b) call
+        // `invalidate` per-key for the keys they manage.
+        //
+        // See: https://redis.io/commands/flushdb/ (no key-scoping)
         Ok(())
     }
 }
