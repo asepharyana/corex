@@ -22,6 +22,11 @@ impl LocalFileStorage {
         Self { root: root.into() }
     }
 
+    /// Returns the root directory path.
+    pub fn root(&self) -> &std::path::Path {
+        &self.root
+    }
+
     fn resolve(&self, path: &str) -> Result<PathBuf, StorageError> {
         let rel = Path::new(path.trim_start_matches('/'));
         for component in rel.components() {
@@ -52,14 +57,30 @@ impl StorageDriver for LocalFileStorage {
         if let Some(parent) = full.parent() {
             tokio::fs::create_dir_all(parent)
                 .await
-                .map_err(|e| StorageError::Io(e.to_string()))?;
+                .map_err(|e| StorageError::Io(e.to_string()))?
         }
-        let mut file = tokio::fs::File::create(&full)
+        // Write to a sibling temp file then atomically rename. On POSIX this is
+        // atomic, so a crash mid-write leaves *either* the previous file *or*
+        // the complete new file — never a half-written truncated object.
+        // Use a PID-unguarded temp name and clean it up if anything fails.
+        let tmp = full.with_extension(format!(".tmp-{}", std::process::id()));
+        let mut file = tokio::fs::File::create(&tmp)
             .await
             .map_err(|e| StorageError::Io(e.to_string()))?;
         let written = tokio::io::copy(&mut data, &mut file)
             .await
+            .map_err(|e| {
+                let _ = std::fs::remove_file(&tmp);
+                StorageError::Io(e.to_string())
+            })?;
+        // Ensure durability: flush to OS, fsync, then rename.
+        tokio::fs::File::open(&tmp)
+            .await
+            .map_err(|e| StorageError::Io(e.to_string()))?
+            .sync_all()
+            .await
             .map_err(|e| StorageError::Io(e.to_string()))?;
+        std::fs::rename(&tmp, &full).map_err(|e| StorageError::Io(e.to_string()))?;
         Ok(written)
     }
 
@@ -161,5 +182,24 @@ mod tests {
             .await
             .unwrap_err();
         assert!(matches!(err, StorageError::InvalidPath(_)));
+    }
+
+    /// Verifies the atomic-write contract: after a successful `put`, the temp
+    /// file must not linger on disk.
+    #[tokio::test]
+    async fn put_leaves_no_temp_file() {
+        let (storage, _dir) = driver();
+        storage
+            .put("clean.txt", bytes_stream(b"data".to_vec()))
+            .await
+            .unwrap();
+        // No `*.tmp-*` files should remain in the root after a clean write.
+        let leftover: Vec<_> = std::fs::read_dir(storage.root())
+            .unwrap()
+            .filter_map(|e| e.ok())
+            .map(|e| e.file_name())
+            .filter(|n| n.to_string_lossy().contains(".tmp-"))
+            .collect();
+        assert!(leftover.is_empty(), "temp files left behind: {leftover:?}");
     }
 }

@@ -19,7 +19,22 @@ pub struct MokaL1 {
 impl MokaL1 {
     /// Builds a Moka cache with `max_capacity` entries and an optional default
     /// `ttl`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `max_capacity` is `0`. In Moka, a `max_capacity` of `0` is a
+    /// sentinel for **zero-entries-allowed** — every `insert` is silently
+    /// dropped — which is almost certainly a caller mistake (the natural way to
+    /// express "unbounded" in other caches). Pass `1..=u64::MAX`; use
+    /// [`MemoryCache`](crate::memory::MemoryCache) if you truly need an
+    /// unbounded in-process cache.
     pub fn new(max_capacity: u64, ttl: Option<Duration>) -> Self {
+        assert!(
+            max_capacity > 0,
+            "mytheclipse-cache: MokaL1::new(max_capacity) must be > 0; \
+             moka treats 0 as a permanent no-insert sentinel. \
+             Use MemoryCache for an unbounded cache."
+        );
         let mut builder = MokaCache::builder().max_capacity(max_capacity);
         if let Some(ttl) = ttl {
             builder = builder.time_to_live(ttl);
@@ -36,14 +51,15 @@ impl Cache for MokaL1 {
         Ok(self.inner.get(key).await)
     }
 
+    /// Inserts `value`, using the cache's configured TTL policy. The per-call
+    /// `ttl` argument is intentionally ignored — Moka applies a single TTL
+    /// configured on the builder, and per-entry overrides are not exposed here.
     async fn set(
         &self,
         key: &str,
         value: Vec<u8>,
         _ttl: Option<Duration>,
     ) -> Result<(), CacheError> {
-        // Per-entry TTL overrides are handled by the builder default in Moka;
-        // the passed `ttl` is intentionally ignored (single configured policy).
         self.inner.insert(key.to_string(), value).await;
         Ok(())
     }
@@ -81,6 +97,14 @@ mod tests {
         assert_eq!(c.get("b").await.unwrap(), Some(b"2".to_vec()));
         c.clear().await.unwrap();
         assert_eq!(c.get("b").await.unwrap(), None);
+    }
+
+    /// Asserts that `max_capacity == 0` panics with a clear message, rather
+    /// than silently creating a cache that never accepts entries.
+    #[test]
+    #[should_panic(expected = "must be > 0")]
+    fn zero_capacity_panics() {
+        let _ = MokaL1::new(0, None);
     }
 
     #[tokio::test]

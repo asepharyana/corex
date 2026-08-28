@@ -4,7 +4,7 @@
 //! Entries are lazily expired on access by comparing against `Instant`; a
 //! monotonic clock keeps TTLs robust against wall-clock discontinuities.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
@@ -15,14 +15,34 @@ use crate::traits::{Cache, CacheError};
 /// A wrapping entry: `None` expiry means the value never expires.
 type Entry = (Vec<u8>, Option<Instant>);
 
-/// An in-process [`Cache`] implementation for L1 caching.
-#[derive(Clone, Default)]
+/// An in-process [`Cache`] for L1 caching.
+///
+/// Default instance is **unbounded** — it grows until the process runs out of
+/// memory. For memory-constrained workloads, use [`MemoryCache::with_max_entries`]
+/// to install a simple LRU-style cap: when the cap is exceeded, the oldest
+/// (least-recently-inserted) entry is evicted.
+#[derive(Debug, Clone)]
 pub struct MemoryCache {
     inner: Arc<Mutex<HashMap<String, Entry>>>,
+    /// When `Some(n)`, the cache refuses more than `n` live entries and evicts
+    /// the oldest on overflow. `None` = unbounded (legacy default).
+    max_entries: Option<usize>,
+    /// Insertion order, for eviction when `max_entries` is set.
+    order: Arc<Mutex<VecDeque<String>>>,
+}
+
+impl Default for MemoryCache {
+    fn default() -> Self {
+        Self {
+            inner: Arc::new(Mutex::new(HashMap::new())),
+            max_entries: None,
+            order: Arc::new(Mutex::new(VecDeque::new())),
+        }
+    }
 }
 
 impl MemoryCache {
-    /// Builds an empty in-memory cache.
+    /// Builds an empty in-memory cache (unbounded by default).
     pub fn new() -> Self {
         Self::default()
     }
@@ -31,6 +51,23 @@ impl MemoryCache {
     pub fn with_capacity(self, capacity: usize) -> Self {
         self.inner.lock().unwrap().reserve(capacity);
         self
+    }
+
+    /// Installs a bounded LRU-style cap. When the cache exceeds `max`, the
+    /// oldest (least-recently-inserted) entry is evicted on each `set`.
+    ///
+    /// This is the recommended constructor for production L1 caches: a
+    /// [`MemoryCache::new()`] (unbounded) left unmanaged can grow without bound
+    /// and exhaust process memory.
+    pub fn with_max_entries(mut self, max: usize) -> Self {
+        assert!(max > 0, "mytheclipse-cache: with_max_entries must be > 0");
+        self.max_entries = Some(max);
+        self
+    }
+
+    /// The configured max entries, if any.
+    pub fn max_entries(&self) -> Option<usize> {
+        self.max_entries
     }
 }
 
@@ -41,6 +78,7 @@ impl Cache for MemoryCache {
         match map.get(key) {
             Some((value, Some(expires))) if *expires <= Instant::now() => {
                 map.remove(key);
+                self.remove_order(key);
                 Ok(None)
             }
             Some((value, _)) => Ok(Some(value.clone())),
@@ -55,21 +93,41 @@ impl Cache for MemoryCache {
         ttl: Option<Duration>,
     ) -> Result<(), CacheError> {
         let expires = ttl.map(|d| Instant::now() + d);
-        self.inner
-            .lock()
-            .unwrap()
-            .insert(key.to_string(), (value, expires));
+        let mut map = self.inner.lock().unwrap();
+        let is_new = !map.contains_key(key);
+        map.insert(key.to_string(), (value, expires));
+        if is_new {
+            let mut order = self.order.lock().unwrap();
+            order.push_back(key.to_string());
+            if let Some(cap) = self.max_entries {
+                while order.len() > cap {
+                    if let Some(oldest) = order.pop_front() {
+                        map.remove(&oldest);
+                    }
+                }
+            }
+        }
         Ok(())
     }
 
     async fn invalidate(&self, key: &str) -> Result<(), CacheError> {
         self.inner.lock().unwrap().remove(key);
+        self.remove_order(key);
         Ok(())
     }
 
     async fn clear(&self) -> Result<(), CacheError> {
         self.inner.lock().unwrap().clear();
+        self.order.lock().unwrap().clear();
         Ok(())
+    }
+}
+
+impl MemoryCache {
+    /// Removes `key` from the insertion-order deque (if present).
+    fn remove_order(&self, key: &str) {
+        let mut order = self.order.lock().unwrap();
+        order.retain(|k| k != key);
     }
 }
 
@@ -156,6 +214,26 @@ mod tests {
         assert_eq!(c.get("b").await.unwrap(), Some(b"2".to_vec()));
         c.clear().await.unwrap();
         assert_eq!(c.get("b").await.unwrap(), None);
+    }
+
+    /// Asserts that an unbounded `MemoryCache::with_max_entries(0)` panics,
+    /// preventing a no-op cache that accepts zero entries.
+    #[test]
+    #[should_panic(expected = "must be > 0")]
+    fn zero_max_panics() {
+        let _ = MemoryCache::new().with_max_entries(0);
+    }
+
+    #[tokio::test]
+    async fn bounded_cache_evicts_oldest() {
+        let c = MemoryCache::new().with_max_entries(2);
+        c.set("a", b"1".to_vec(), None).await.unwrap();
+        c.set("b", b"2".to_vec(), None).await.unwrap();
+        c.set("c", b"3".to_vec(), None).await.unwrap();
+        // "a" (oldest) should have been evicted.
+        assert_eq!(c.get("a").await.unwrap(), None);
+        assert_eq!(c.get("b").await.unwrap(), Some(b"2".to_vec()));
+        assert_eq!(c.get("c").await.unwrap(), Some(b"3".to_vec()));
     }
 
     #[cfg(feature = "cache-aside")]
