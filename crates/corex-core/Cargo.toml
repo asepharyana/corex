@@ -1,0 +1,31 @@
+[package]
+name = "corex-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+authors.workspace = true
+description = "Core allocation logic and execution primitives for corex."
+readme = "README.md"
+keywords = ["async", "concurrency", "rayon", "tokio", "resource-management"]
+categories = ["asynchronous", "concurrency", "rust-patterns"]
+
+[features]
+default = []
+io = ["dep:tokio"]
+compute = ["dep:rayon"]
+bg = ["dep:tokio"]
+full = ["io", "compute", "bg"]
+
+[dependencies]
+tokio = { workspace = true, optional = true }
+rayon = { workspace = true, optional = true }
+num_cpus = { workspace = true }
+tracing = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

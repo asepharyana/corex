@@ -1,0 +1,62 @@
+[workspace]
+resolver = "2"
+members = ["crates/corex-core"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/username/corex"
+homepage = "https://github.com/username/corex"
+documentation = "https://docs.rs/corex"
+authors = ["The corex Authors"]
+
+[workspace.dependencies]
+tokio = { version = "1.53", features = ["full"] }
+rayon = "1.12"
+num_cpus = "1.17"
+tracing = "0.1"
+corex-core = { path = "crates/corex-core", version = "0.1.0", default-features = false }
+
+[package]
+name = "corex"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+authors.workspace = true
+description = "Resource-aware abstractions for async I/O, heavy compute, and background queue management."
+readme = "README.md"
+keywords = ["async", "concurrency", "rayon", "tokio", "resource-management"]
+categories = ["asynchronous", "concurrency", "rust-patterns"]
+
+[lib]
+name = "corex"
+path = "src/lib.rs"
+
+[features]
+default = []
+io = ["corex-core/io"]
+compute = ["corex-core/compute"]
+bg = ["corex-core/bg"]
+full = ["io", "compute", "bg"]
+
+[dependencies]
+corex-core = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }
+tracing-subscriber = "0.3"
+
+[[example]]
+name = "main"
+path = "examples/main.rs"
+required-features = ["full"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
