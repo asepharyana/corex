@@ -1,3 +1,10 @@
+## [0.2.2](https://github.com/asepharyana/corex/compare/v0.2.1...v0.2.2) (2026-08-28)
+
+
+### Bug Fixes
+
+* **release:** dispatch publish via gh api in exec successCmd ([3c04aa4](https://github.com/asepharyana/corex/commit/3c04aa44b6110c8ce15278d7dc76828c44dfc8d9))
+
 ## [0.2.1](https://github.com/asepharyana/corex/compare/v0.2.0...v0.2.1) (2026-08-28)
 
 
