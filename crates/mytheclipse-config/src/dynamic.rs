@@ -49,7 +49,10 @@ impl<T: Config + Clone> DynamicConfig<T> {
 
     /// Replaces the current value and notifies subscribers.
     pub fn set(&self, new: T) {
-        *self.inner.write().expect("mytheclipse-config: RwLock poisoned") = new;
+        *self
+            .inner
+            .write()
+            .expect("mytheclipse-config: RwLock poisoned") = new;
         let _ = self.tx.send(());
     }
 

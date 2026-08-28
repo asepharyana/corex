@@ -52,7 +52,8 @@ impl S3Storage {
         access_key: &str,
         secret_key: &str,
     ) -> Self {
-        let credentials = Credentials::new(access_key, secret_key, None, None, "mytheclipse-storage");
+        let credentials =
+            Credentials::new(access_key, secret_key, None, None, "mytheclipse-storage");
         let config = aws_sdk_s3::Config::builder()
             .region(Region::new(region.to_string()))
             .endpoint_url(endpoint)
@@ -322,13 +323,19 @@ mod tests {
         .await;
 
         storage
-            .put("mytheclipse-storage-test.txt", bytes_stream(b"hello s3".to_vec()))
+            .put(
+                "mytheclipse-storage-test.txt",
+                bytes_stream(b"hello s3".to_vec()),
+            )
             .await
             .unwrap();
         let data = read_to_vec(storage.get("mytheclipse-storage-test.txt").await.unwrap())
             .await
             .unwrap();
         assert_eq!(data, b"hello s3");
-        storage.delete("mytheclipse-storage-test.txt").await.unwrap();
+        storage
+            .delete("mytheclipse-storage-test.txt")
+            .await
+            .unwrap();
     }
 }

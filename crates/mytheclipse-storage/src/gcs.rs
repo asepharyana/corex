@@ -160,6 +160,9 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(data, b"hello gcs");
-        storage.delete("mytheclipse-storage-test.txt").await.unwrap();
+        storage
+            .delete("mytheclipse-storage-test.txt")
+            .await
+            .unwrap();
     }
 }
