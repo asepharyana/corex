@@ -50,6 +50,14 @@ jobs:
             flags: "--no-default-features --features compute"
           - name: bg only
             flags: "--no-default-features --features bg"
+          - name: resiliency only
+            flags: "--no-default-features --features resiliency"
+          - name: traffic only
+            flags: "--no-default-features --features traffic"
+          - name: lifecycle only
+            flags: "--no-default-features --features lifecycle"
+          - name: observability only
+            flags: "--no-default-features --features observability"
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable

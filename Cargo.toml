@@ -8,14 +8,15 @@ repository = "https://github.com/asepharyana/mytheclipse"
 homepage = "https://github.com/asepharyana/mytheclipse"
 documentation = "https://docs.rs/mytheclipse"
 authors = ["asepharyana <superaseph@gmail.com>"]
-description = "Resource-aware abstractions for async I/O, heavy compute, and background queue management."
+description = "Resource-aware abstractions for async I/O, heavy compute, background queue management, resiliency, traffic control, lifecycle, and observability."
 readme = "README.md"
-keywords = ["async", "concurrency", "rayon", "tokio", "resource-management"]
+keywords = ["async", "concurrency", "rayon", "tokio", "resource-management", "resiliency", "retry", "circuit-breaker", "rate-limit", "observability", "cron", "shutdown"]
 categories = ["asynchronous", "concurrency", "rust-patterns"]
 
 [dependencies]
 tokio = { version = "1.53", features = ["full"], optional = true }
 rayon = { version = "1.12", optional = true }
+rand = { version = "0.8", optional = true }
 num_cpus = "1.17"
 tracing = "0.1"
 
@@ -28,7 +29,11 @@ default = []
 io = ["dep:tokio"]
 compute = ["dep:rayon"]
 bg = ["dep:tokio"]
-full = ["io", "compute", "bg"]
+resiliency = ["dep:tokio", "dep:rand"]
+traffic = ["dep:tokio"]
+lifecycle = ["dep:tokio"]
+observability = ["dep:tokio"]
+full = ["io", "compute", "bg", "resiliency", "traffic", "lifecycle", "observability"]
 
 [[example]]
 name = "main"
