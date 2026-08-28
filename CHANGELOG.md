@@ -1,3 +1,13 @@
+# [1.0.0](https://github.com/asepharyana/mytheclipse/compare/v0.2.4...v1.0.0) (2026-08-28)
+
+
+* feat!: rename CorexError to MytheclipseError ([7cdf525](https://github.com/asepharyana/mytheclipse/commit/7cdf52544c611b05c6365595a8ae713672706b67))
+
+
+### BREAKING CHANGES
+
+* CorexError is renamed to MytheclipseError.
+
 ## [0.2.4](https://github.com/asepharyana/corex/compare/v0.2.3...v0.2.4) (2026-08-28)
 
 
