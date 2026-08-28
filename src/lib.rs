@@ -30,7 +30,7 @@ pub mod bg;
 pub use context::{context, EngineContext};
 
 #[cfg(feature = "compute")]
-pub use error::CorexError;
+pub use error::MytheclipseError;
 
 #[cfg(feature = "io")]
 pub use io::spawn_io;

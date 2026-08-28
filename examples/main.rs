@@ -18,7 +18,7 @@ async fn main() {
 
     let sum_result = mytheclipse::compute(|| (1..=1_000u64).sum::<u64>());
 
-    let panic_result: Result<u64, mytheclipse::CorexError> = mytheclipse::compute(|| {
+    let panic_result: Result<u64, mytheclipse::MytheclipseError> = mytheclipse::compute(|| {
         panic!("intentional panic to demonstrate isolation");
     });
 

@@ -7,7 +7,7 @@
 /// wildcard arm.
 #[non_exhaustive]
 #[derive(Debug)]
-pub enum CorexError {
+pub enum MytheclipseError {
     /// A closure submitted to [`crate::compute::compute`] panicked.
     ///
     /// The contained string is a best-effort rendering of the panic
@@ -15,7 +15,7 @@ pub enum CorexError {
     ComputePanic(String),
 }
 
-impl std::fmt::Display for CorexError {
+impl std::fmt::Display for MytheclipseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::ComputePanic(message) => {
@@ -25,4 +25,4 @@ impl std::fmt::Display for CorexError {
     }
 }
 
-impl std::error::Error for CorexError {}
+impl std::error::Error for MytheclipseError {}
