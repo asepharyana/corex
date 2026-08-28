@@ -1,3 +1,10 @@
+## [0.2.3](https://github.com/asepharyana/corex/compare/v0.2.2...v0.2.3) (2026-08-28)
+
+
+### Bug Fixes
+
+* **release:** hardcode repo in successCmd gh api ([d3c35ec](https://github.com/asepharyana/corex/commit/d3c35eccd0e3e1da21bcfed50ce2ba1f82d03cc5))
+
 ## [0.2.2](https://github.com/asepharyana/corex/compare/v0.2.1...v0.2.2) (2026-08-28)
 
 
