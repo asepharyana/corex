@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/asepharyana/corex/compare/v0.2.0...v0.2.1) (2026-08-28)
+
+
+### Bug Fixes
+
+* **release:** dispatch publish via exec successCmd not step output ([6c8c98e](https://github.com/asepharyana/corex/commit/6c8c98e86cf27b6a998124e3de3b226a78c82f66))
+
 # [0.2.0](https://github.com/asepharyana/corex/compare/v0.1.0...v0.2.0) (2026-08-28)
 
 
