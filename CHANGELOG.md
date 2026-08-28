@@ -1,3 +1,10 @@
+## [1.3.5](https://github.com/asepharyana/mytheclipse/compare/v1.3.4...v1.3.5) (2026-08-28)
+
+
+### Bug Fixes
+
+* **cache:** honor sub-second Redis TTL via PSETEX + document clear() safety ([2c9367a](https://github.com/asepharyana/mytheclipse/commit/2c9367a83c2dd01b1e197ec33215a6c7d3755fa2))
+
 ## [1.3.4](https://github.com/asepharyana/mytheclipse/compare/v1.3.3...v1.3.4) (2026-08-28)
 
 
