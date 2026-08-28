@@ -10,7 +10,7 @@
       "@semantic-release/exec",
       {
         "prepareCmd": "sed -i 's/^version = \\\"[^\\\"]*\\\"/version = \\\"${nextRelease.version}\\\"/' Cargo.toml && cargo check",
-        "successCmd": "gh api -X POST repos/asepharyana/corex/actions/workflows/publish.yml/dispatches -f ref=main -f 'inputs[tag]=v${nextRelease.version}'"
+        "successCmd": "gh api -X POST repos/asepharyana/mytheclipse/actions/workflows/publish.yml/dispatches -f ref=main -f 'inputs[tag]=v${nextRelease.version}'"
       }
     ],
     [
