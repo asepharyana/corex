@@ -17,9 +17,12 @@
 //!
 //! ## Example
 //!
+//! Multi-layer + cache-aside composition (default features):
+//!
 //! ```no_run
-//! use mytheclipse_cache::{Cache, MemoryCache, MultiLayerCache, CacheAside};
+//! # #[cfg(all(feature = "l1-memory", feature = "cache-aside"))]
 //! # async fn run() {
+//! use mytheclipse_cache::{Cache, MemoryCache, MultiLayerCache, CacheAside};
 //! let l1 = MemoryCache::new();
 //! let l2 = MemoryCache::new(); // in a real app: a RedisCache
 //! let cache = MultiLayerCache::new(l1, l2);
@@ -34,6 +37,8 @@
 //! );
 //! let _v = aside.get("orders:42").await.unwrap();
 //! # }
+//! # #[cfg(not(all(feature = "l1-memory", feature = "cache-aside")))]
+//! # fn run() {}
 //! ```
 
 #![forbid(unsafe_code)]
