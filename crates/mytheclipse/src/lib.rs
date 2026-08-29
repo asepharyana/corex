@@ -44,7 +44,7 @@ pub use retry_ext::RetryExt;
 #[cfg(feature = "resiliency")]
 pub use aggregate_error::AggregateError;
 #[cfg(feature = "resiliency")]
-pub use parallel_map::{parallel_map, parallel_map_unordered};
+pub use parallel_map::{parallel_map, parallel_map_unordered, parallel_for_each};
 #[cfg(feature = "observability")]
 pub mod auto_metrics_service;
 #[cfg(feature = "observability")]

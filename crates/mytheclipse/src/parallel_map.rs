@@ -1,8 +1,9 @@
 //! Bounded parallel map over collections (feature `resiliency`).
 //!
-//! [`parallel_map`] / [`parallel_map_unordered`] fan out work across a
-//! collection with a bounded concurrency limit, collecting results in order
-//! (or completion order). This removes the manual `Semaphore + join_all` +
+//! [`parallel_map`], [`parallel_map_unordered`] fan work out across a
+//! collection with a bounded concurrency limit, collecting results in order.
+//! [`parallel_for_each`] is a streaming variant that never materializes the
+//! whole input in memory. These remove the manual `Semaphore + join_all` +
 //! error-aggregation boilerplate that races easily when done by hand.
 
 use std::future::Future;
@@ -18,6 +19,9 @@ use crate::aggregate_error::AggregateError;
 /// If any future fails, its error is aggregated into a single
 /// [`AggregateError`]; all other tasks keep running (fan-out semantics) so
 /// failures don't stop in-flight work.
+///
+/// Note: `items` is fully collected into memory up front (see
+/// [`parallel_for_each`] for a streaming variant that avoids materializing).
 pub async fn parallel_map<I, T, F, Fut, E>(
     items: I,
     concurrency: usize,
@@ -95,8 +99,6 @@ where
 
     let mut results = Vec::with_capacity(tasks.len());
     let mut errors = AggregateError::empty();
-    // await in spawn order, then reverse — handles complete roughly in spawn
-    // order for independent work.
     for handle in tasks {
         match handle.await {
             Ok(Ok(v)) => results.push(v),
@@ -107,6 +109,86 @@ where
 
     if errors.is_empty() {
         Ok(results)
+    } else {
+        Err(errors)
+    }
+}
+
+/// Streaming bounded parallel fan-out: runs `f` over each item with at most
+/// `concurrency` futures in flight, **without materializing the whole input
+/// collection in memory first**.
+///
+/// This is the right choice for large/streaming inputs (e.g. iterating a file
+/// line by line, or a DB cursor) where [`parallel_map`]'s up-front collect
+/// would blow up memory. Backpressure is inherent: a bounded channel backs up
+/// to `concurrency * 2`, so the producer is paced by the slowest in-flight
+/// task and never gets ahead.
+///
+/// Errors are aggregated into a single [`AggregateError`].
+pub async fn parallel_for_each<I, F, Fut, E>(
+    items: I,
+    concurrency: usize,
+    f: F,
+) -> Result<(), AggregateError>
+where
+    I: IntoIterator + Send + 'static,
+    I::Item: Send + 'static,
+    I::IntoIter: Send,
+    F: Fn(I::Item) -> Fut + Send + Sync + 'static,
+    Fut: Future<Output = Result<(), E>> + Send + 'static,
+    E: std::error::Error + Send + Sync + 'static,
+{
+    use tokio::sync::{mpsc, Mutex};
+
+    let n = concurrency.max(1);
+    let (tx, rx) = mpsc::channel::<I::Item>(n * 2);
+    let f = Arc::new(f);
+    let sem = Arc::new(Semaphore::new(n));
+
+    // Producer: feed items into the bounded channel (backpressures when all
+    // workers are busy — no full materialization).
+    tokio::spawn(async move {
+        let mut it = items.into_iter();
+        while let Some(item) = it.next() {
+            if tx.send(item).await.is_err() {
+                break; // all workers dropped
+            }
+        }
+    });
+
+    // A `mpsc::Receiver` is not Clone, so workers share it behind a mutex and
+    // take turns receiving. Bounded concurrency is enforced by the semaphore.
+    let rx = Arc::new(Mutex::new(rx));
+    let mut handles = Vec::with_capacity(n);
+    for _ in 0..n {
+        let rx = Arc::clone(&rx);
+        let f = Arc::clone(&f);
+        let sem = Arc::clone(&sem);
+        handles.push(tokio::spawn(async move {
+            loop {
+                let item = { rx.lock().await.recv().await };
+                match item {
+                    Some(item) => {
+                        let sem = Arc::clone(&sem);
+                        let _permit = sem.acquire_owned().await.expect("semaphore closed");
+                        let _ = f(item).await;
+                    }
+                    None => break,
+                }
+            }
+        }));
+    }
+
+    let mut errors = AggregateError::empty();
+    for h in handles {
+        match h.await {
+            Ok(()) => {}
+            Err(join_err) => errors.push(Box::new(join_err)),
+        }
+    }
+
+    if errors.is_empty() {
+        Ok(())
     } else {
         Err(errors)
     }
@@ -155,5 +237,26 @@ mod tests {
         )
         .await;
         assert_eq!(out.unwrap(), vec![]);
+    }
+
+    #[tokio::test]
+    async fn for_each_processes_all_items() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        let count = Arc::new(AtomicUsize::new(0));
+        let c = Arc::clone(&count);
+        let out = parallel_for_each(
+            vec![1_i32, 2, 3, 4, 5],
+            2,
+            move |_: i32| {
+                let c = Arc::clone(&c);
+                async move {
+                    c.fetch_add(1, Ordering::SeqCst);
+                    Ok::<_, std::io::Error>(())
+                }
+            },
+        )
+        .await;
+        assert!(out.is_ok());
+        assert_eq!(count.load(Ordering::SeqCst), 5);
     }
 }

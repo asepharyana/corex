@@ -5,9 +5,6 @@
 //! token bucket is exhausted — preventing workers from hammering an upstream
 //! service faster than its rate limit allows.
 
-use std::sync::Arc;
-use std::time::Duration;
-
 use crate::rate_limited::RateLimitedQueue;
 use crate::worker::{JobHandler, WorkerConfig, WorkerPool};
 use crate::traits::Queue;
