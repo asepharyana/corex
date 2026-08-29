@@ -1,3 +1,119 @@
+# [1.18.0](https://github.com/asepharyana/mytheclipse/compare/v1.17.0...v1.18.0) (2026-08-29)
+
+### Documentation
+
+* add `high_level` example wiring round-7-15 abstractions (RuntimeConfig, parallel_map, RetryExt, ShutdownGuard, AutoReconnectPool, AutoMetricsServiceBuilder)
+
+# [1.17.0](https://github.com/asepharyana/mytheclipse/compare/v1.16.0...v1.17.0) (2026-08-29)
+
+### Features
+
+* **parallel_map:** add `parallel_for_each` streaming bounded fan-out (no full input materialization)
+
+# [1.16.0](https://github.com/asepharyana/mytheclipse/compare/v1.15.0...v1.16.0) (2026-08-29)
+
+### Features
+
+* **parallel_map:** add `parallel_map` / `parallel_map_unordered` bounded fan-out with AggregateError
+
+# [1.15.0](https://github.com/asepharyana/mytheclipse/compare/v1.14.0...v1.15.0) (2026-08-29)
+
+### Features
+
+* **aggregate_error:** add `AggregateError` for parallel/fan-out error aggregation
+
+# [1.14.0](https://github.com/asepharyana/mytheclipse/compare/v1.13.0...v1.14.0) (2026-08-29)
+
+### Features
+
+* **pool:** add `AutoReconnectPool` + `Reconnectable` self-healing resource pool
+
+# [1.13.0](https://github.com/asepharyana/mytheclipse/compare/v1.12.0...v1.13.0) (2026-08-29)
+
+### Features
+
+* **runtime_auto:** add `RuntimeConfig` auto thread/core allocation + `ShutdownGuard` RAII
+
+# [1.12.0](https://github.com/asepharyana/mytheclipse/compare/v1.11.0...v1.12.0) (2026-08-29)
+
+### Features
+
+* **auto_metrics:** add `AutoMetricsServiceBuilder` (metrics + [mytheclipse-queue](crates/mytheclipse-queue) `RateLimitedWorkerPool`)
+
+# [1.11.0](https://github.com/asepharyana/mytheclipse/compare/v1.10.0...v1.11.0) (2026-08-29)
+
+### Features
+
+* **retry_ext:** add ergonomic `RetryExt` Future extension — also covers ResilientHttpClient from [mytheclipse-http](crates/mytheclipse-http)
+
+# [1.10.0](https://github.com/asepharyana/mytheclipse/compare/v1.9.0...v1.10.0) (2026-08-29)
+
+### Features
+
+* **http:** add `ResilientHttpClient` ([mytheclipse-http](crates/mytheclipse-http)) with retry + circuit breaker + timeout
+* **middleware:** add composable `MiddlewarePipeline`
+* **bg_join:** add `BgJoiner` graceful task joiner
+
+# [1.9.0](https://github.com/asepharyana/mytheclipse/compare/v1.8.0...v1.9.0) (2026-08-28)
+
+### Features
+
+* **bg_join:** add `BgJoiner` graceful task joiner
+* **middleware:** add composable `MiddlewarePipeline`
+* **queue:** add `RateLimitedQueue` ([mytheclipse-queue](crates/mytheclipse-queue))
+
+# [1.8.0](https://github.com/asepharyana/mytheclipse/compare/v1.7.0...v1.8.0) (2026-08-28)
+
+### Features
+
+* **pool_health:** add `HealthCheckedPool`
+* **crypto:** add `HkdfKeyDeriver` ([mytheclipse-crypto](crates/mytheclipse-crypto))
+* **queue:** add `BackpressureEnforcer` / `enqueue_with_backpressure`
+
+# [1.7.0](https://github.com/asepharyana/mytheclipse/compare/v1.6.0...v1.7.0) (2026-08-28)
+
+### Features
+
+* **batch:** add `BatchProcessor` & `BatchJobHandler`
+* **health:** add `CircuitBreakerHealthCheck` / `MetricsHealthCheck`
+* **crypto:** add `TypedKeyRegistry`
+* **http:** add `MetricsHttpHandler`
+
+# [1.6.0](https://github.com/asepharyana/mytheclipse/compare/v1.5.0...v1.6.0) (2026-08-28)
+
+### Features
+
+* **circuit_breaker:** add snapshot metrics
+* **retry:** add `RetryStats`
+* lifecycle fixes
+
+# [1.5.0](https://github.com/asepharyana/mytheclipse/compare/v1.4.1...v1.5.0) (2026-08-28)
+
+### Features
+
+* **validation:** add `ConfigValidator`
+* **lifecycle:** add `AsyncLifecycleManager`
+* **metrics:** add `MetricsBridge`
+* **ratelimit:** rate limiter pre-acquire
+
+# [1.4.0](https://github.com/asepharyana/mytheclipse/compare/v1.3.5...v1.4.0) (2026-08-28)
+
+### Features
+
+* add 4 new crates: [mytheclipse-queue](crates/mytheclipse-queue), [mytheclipse-tracing](crates/mytheclipse-tracing), [mytheclipse-http](crates/mytheclipse-http), [mytheclipse-cli](crates/mytheclipse-cli)
+
+# [1.3.0](https://github.com/asepharyana/mytheclipse/compare/v1.2.0...v1.3.0) (2026-08-28)
+
+### Features
+
+* add [mytheclipse-storage](crates/mytheclipse-storage) crate for unified storage abstraction
+
+# [1.2.0](https://github.com/asepharyana/mytheclipse/compare/v1.1.0...v1.2.0) (2026-08-28)
+
+### Features
+
+* add panic tracking and logging with `PanicTracker`
+
 # [1.1.0](https://github.com/asepharyana/mytheclipse/compare/v1.0.0...v1.1.0) (2026-08-28)
 
 
