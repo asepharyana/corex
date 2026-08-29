@@ -37,6 +37,10 @@ pub mod retry;
 pub mod retry_ext;
 #[cfg(feature = "resiliency")]
 pub use retry_ext::RetryExt;
+#[cfg(feature = "observability")]
+pub mod auto_metrics_service;
+#[cfg(feature = "observability")]
+pub use auto_metrics_service::AutoMetricsServiceBuilder;
 #[cfg(feature = "resiliency")]
 pub mod circuit_breaker;
 #[cfg(feature = "resiliency")]

@@ -9,43 +9,6 @@
 //! - **Redis** (`redis`) — LIST-based queue with atomic moves.
 //! - **NATS JetStream** (`nats`) — durable consumer with ACK/NACK.
 //! - **PostgreSQL** (`postgres`) — `SKIP LOCKED` polling.
-//!
-//! ## Quick Start
-//!
-//! ```toml
-//! [dependencies]
-//! mytheclipse-queue = "0.2"
-//! ```
-//!
-//! ```ignore
-//! use mytheclipse_queue::{InMemoryQueue, WorkerPool, JobHandler, Job};
-//! ...
-//! let queue = InMemoryQueue::new();
-//! queue.enqueue("email", b"hello".to_vec()).await?;
-//!
-//! fn make_handler() -> impl JobHandler {
-//!     struct PrintHandler;
-//!     impl JobHandler for PrintHandler {
-//!         fn handle(&self, job: Job) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), mytheclipse_queue::JobError>> + Send>> {
-//!             Box::pin(async move {
-//!                 println!("payload: {:?}", job.payload);
-//!                 Ok(())
-//!             })
-//!         }
-//!     }
-//!     PrintHandler
-//! }
-//!
-//! # #[tokio::main]
-//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let queue = InMemoryQueue::new();
-//! queue.enqueue("email", b"hello".to_vec()).await?;
-//!
-//! let pool = WorkerPool::new(queue, 4);
-//! pool.start("email", make_handler());
-//! # Ok(())
-//! # }
-//! ```
 
 pub mod error;
 pub mod job;
@@ -61,22 +24,15 @@ pub mod backpressure_enqueue;
 #[cfg(feature = "in-memory")]
 pub mod rate_limited;
 #[cfg(feature = "in-memory")]
+pub mod worker_rate_limited;
+#[cfg(feature = "in-memory")]
 pub use backpressure_enqueue::{BackpressureEnforcer, BackpressureError, enqueue_with_backpressure};
 #[cfg(feature = "in-memory")]
 pub use rate_limited::{RateLimitedQueue, RateLimitQueueError};
+#[cfg(feature = "in-memory")]
+pub use worker_rate_limited::RateLimitedWorkerPool;
 
 #[cfg(feature = "in-memory")]
 pub mod pipeline;
-
-#[cfg(feature = "in-memory")]
-pub use in_memory::InMemoryQueue;
-
-pub use traits::Queue;
-pub use job::{Job, JobId};
-pub use worker::{WorkerPool, WorkerConfig, JobHandler, JobFuture};
-pub use error::{QueueError, JobError};
-
-#[cfg(feature = "in-memory")]
-pub use batch::{BatchConfig, BatchJobHandler, BatchProcessor, BatchFlush};
 #[cfg(feature = "in-memory")]
 pub use pipeline::{StageRunner, Stage, StageError};
