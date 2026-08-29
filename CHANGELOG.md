@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/asepharyana/mytheclipse/compare/v1.3.5...v1.4.0) (2026-08-29)
+
+
+### Features
+
+* add 4 new crates (queue, tracing, http, cli) + enhancements to existing crates ([8106f89](https://github.com/asepharyana/mytheclipse/commit/8106f8943ebe83f7348b9fde3fbd2e347018604e))
+
 ## [1.3.5](https://github.com/asepharyana/mytheclipse/compare/v1.3.4...v1.3.5) (2026-08-28)
 
 
