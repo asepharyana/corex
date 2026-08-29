@@ -9,6 +9,11 @@
 //! mytheclipse-http = { version = "0.2", features = ["client"] }
 //! ```
 
+#[cfg(feature = "resilience")]
+pub mod resilient_client;
+#[cfg(feature = "resilience")]
+pub use resilient_client::{ResilientHttpClient, ResilientClientConfig};
+
 #[cfg(feature = "client")]
 pub mod client;
 

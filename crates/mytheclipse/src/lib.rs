@@ -114,7 +114,7 @@ pub use health::{HealthCheck, HealthRegistry, HealthStatus};
 pub use leader::{InProcLeaderElection, LeaderElection};
 
 #[cfg(feature = "resiliency")]
-pub use service_builder::ServiceBuilder;
+pub use service_builder::{RunError, ServiceBuilder, ServiceConfig};
 
 #[cfg(feature = "lifecycle")]
 pub use dlock::{DistributedLock, LockError, LockGuard, InProcLock};
