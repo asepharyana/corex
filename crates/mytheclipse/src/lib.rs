@@ -109,7 +109,7 @@ pub use error::MytheclipseError;
 #[cfg(feature = "io")]
 pub use io::spawn_io;
 #[cfg(feature = "compute")]
-pub use compute::compute;
+pub use compute::{compute, compute_join, compute_map, compute_par_for_each, ComputeErrors};
 #[cfg(feature = "bg")]
 pub use bg::spawn_bg;
 
