@@ -34,6 +34,10 @@ pub mod bg;
 #[cfg(feature = "resiliency")]
 pub mod retry;
 #[cfg(feature = "resiliency")]
+pub mod retry_ext;
+#[cfg(feature = "resiliency")]
+pub use retry_ext::RetryExt;
+#[cfg(feature = "resiliency")]
 pub mod circuit_breaker;
 #[cfg(feature = "resiliency")]
 pub mod timeout;
