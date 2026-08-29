@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/asepharyana/mytheclipse/compare/v1.7.0...v1.8.0) (2026-08-29)
+
+
+### Features
+
+* round-5 abstractions — BatchProcessor, CircuitBreakerHealthCheck, TypedKeyRegistry, MetricsHttpHandler ([97b5e02](https://github.com/asepharyana/mytheclipse/commit/97b5e02820674a5b61a2d396f95df07f2b4fd735))
+
 # [1.7.0](https://github.com/asepharyana/mytheclipse/compare/v1.6.0...v1.7.0) (2026-08-29)
 
 
