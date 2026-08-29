@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/asepharyana/mytheclipse/compare/v1.6.0...v1.7.0) (2026-08-29)
+
+
+### Features
+
+* round-5 abstractions — CircuitBreakerHealthCheck, TypedKeyRegistry, MetricsHttpHandler ([510aadc](https://github.com/asepharyana/mytheclipse/commit/510aadc066a428c1627a38bdb22e4f0440cc01b3))
+
 # [1.6.0](https://github.com/asepharyana/mytheclipse/compare/v1.5.0...v1.6.0) (2026-08-29)
 
 
