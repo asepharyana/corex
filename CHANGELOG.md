@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/asepharyana/mytheclipse/compare/v1.12.0...v1.13.0) (2026-08-29)
+
+
+### Features
+
+* round-10 abstractions — AutoMetricsServiceBuilder, RateLimitedWorkerPool ([2f445d3](https://github.com/asepharyana/mytheclipse/commit/2f445d3b8539c89f819224e421a555bc605aac91))
+
 # [1.12.0](https://github.com/asepharyana/mytheclipse/compare/v1.11.0...v1.12.0) (2026-08-29)
 
 
