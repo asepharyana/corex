@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/asepharyana/mytheclipse/compare/v1.5.0...v1.6.0) (2026-08-29)
+
+
+### Features
+
+* round-4 metrics for circuit breaker + retry stats + lifecycle fixes ([717e690](https://github.com/asepharyana/mytheclipse/commit/717e6905cd7a3f7389b455d01054a2c2cc28befd))
+
 # [1.5.0](https://github.com/asepharyana/mytheclipse/compare/v1.4.1...v1.5.0) (2026-08-29)
 
 
