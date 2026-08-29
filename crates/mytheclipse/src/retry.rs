@@ -85,6 +85,79 @@ impl<E: std::fmt::Display> std::fmt::Display for RetryError<E> {
 
 impl<E: std::fmt::Debug + std::fmt::Display> std::error::Error for RetryError<E> {}
 
+/// Statistics collected during a [`retry`] call.
+#[derive(Debug, Clone, Default)]
+pub struct RetryStats {
+    /// Total number of attempts made (including the first).
+    pub attempts: u32,
+    /// Number of retries performed (= `attempts - 1` if exhausted, or
+    /// `attempts - 1` if ultimately succeeded after at least one retry).
+    pub retries: u32,
+    /// The error message from the final attempt, if any.
+    pub last_error: Option<String>,
+}
+
+/// Like [`retry`] but also returns [`RetryStats`] capturing attempt counts.
+///
+/// Retries `op` according to `config`, retrying only errors for which
+/// `filter` returns `true`.
+///
+/// Like [`retry`] but also returns [`RetryStats`].
+pub async fn retry_with_stats<T, E, F, Fut, P>(
+    config: RetryConfig,
+    filter: P,
+    mut op: F,
+) -> (Result<T, RetryError<E>>, RetryStats)
+where
+    F: FnMut() -> Fut,
+    Fut: Future<Output = Result<T, E>>,
+    P: Fn(&E) -> bool,
+    E: std::fmt::Display,
+{
+    let mut attempt: u32 = 0;
+    let mut last_error: Option<String> = None;
+    loop {
+        attempt += 1;
+        let span = tracing::info_span!(
+            "mytheclipse_retry_task",
+            attempt,
+            max_attempts = config.max_attempts
+        );
+        let result = op().instrument(span).await;
+
+        match result {
+            Ok(value) => {
+                let stats = RetryStats {
+                    attempts: attempt,
+                    retries: attempt.saturating_sub(1),
+                    last_error,
+                };
+                return (Ok(value), stats);
+            }
+            Err(err) => {
+                last_error = Some(err.to_string());
+                let retryable = filter(&err);
+                if !retryable || attempt >= config.max_attempts {
+                    let stats = RetryStats {
+                        attempts: attempt,
+                        retries: attempt.saturating_sub(1),
+                        last_error,
+                    };
+                    return (
+                        Err(RetryError::Exhausted {
+                            attempts: attempt,
+                            last: err,
+                        }),
+                        stats,
+                    );
+                }
+                let delay = backoff_delay(&config, attempt, rand::thread_rng());
+                tokio::time::sleep(delay).await;
+            }
+        }
+    }
+}
+
 /// Retries `op` according to `config`, retrying only errors for which
 /// `filter` returns `true`.
 ///
@@ -236,6 +309,24 @@ mod tests {
             Err(RetryError::Exhausted { attempts: 1, .. })
         ));
         assert_eq!(calls.get(), 1);
+    }
+
+    #[tokio::test]
+    async fn retry_with_stats_succeeds_with_counts() {
+        use std::cell::Cell;
+        let config = RetryConfig {
+            max_attempts: 5,
+            base_delay: Duration::from_millis(1),
+            ..RetryConfig::default()
+        };
+        let calls = Cell::new(0u32);
+        let (result, stats) = retry_with_stats(config, |_| true, || async {
+            calls.set(calls.get() + 1);
+            if calls.get() < 3 { Err::<u32, &str>("fail") } else { Ok(42u32) }
+        }).await;
+        assert_eq!(result.unwrap(), 42);
+        assert_eq!(stats.attempts, 3);
+        assert_eq!(stats.retries, 2);
     }
 
     #[test]

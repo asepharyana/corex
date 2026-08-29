@@ -22,6 +22,17 @@ pub enum CircuitState {
     HalfOpen,
 }
 
+/// Point-in-time snapshot of a [`CircuitBreaker`] for metrics/observability.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CircuitSnapshot {
+    /// Current circuit state.
+    pub state: CircuitState,
+    /// Consecutive failures recorded (resets on success in `Closed`).
+    pub failures: u64,
+    /// Consecutive successes recorded (resets on failure/open).
+    pub successes: u64,
+}
+
 const CLOSED: u8 = 0;
 const OPEN: u8 = 1;
 const HALF_OPEN: u8 = 2;
@@ -199,6 +210,16 @@ impl CircuitBreaker {
         *self.inner.opened_at.lock().unwrap() = None;
     }
 
+    /// Returns a point-in-time snapshot of the breaker's internal counters and
+    /// state, for metrics/observability export.
+    pub fn snapshot(&self) -> CircuitSnapshot {
+        CircuitSnapshot {
+            state: self.state(),
+            failures: self.inner.failures.load(Ordering::Acquire),
+            successes: self.inner.successes.load(Ordering::Acquire),
+        }
+    }
+
     fn record_result(&self, success: bool) {
         match self.inner.state.load(Ordering::Acquire) {
             HALF_OPEN => {
@@ -361,5 +382,26 @@ mod tests {
         assert_eq!(ok.unwrap(), 5);
         let err: Result<u32, CircuitError<u8>> = b.call(|| Err(9u8));
         assert!(matches!(err, Err(CircuitError::Inner(9))));
+    }
+
+    #[test]
+    fn snapshot_reflects_state_and_counts() {
+        let b = breaker();
+        let snap = b.snapshot();
+        assert_eq!(snap.state, CircuitState::Closed);
+        assert_eq!(snap.failures, 0);
+        assert_eq!(snap.successes, 0);
+
+        // success in Closed state resets failure count (no failure counter added).
+        b.call::<(), u8, _>(|| Ok(()));
+        let snap2 = b.snapshot();
+        assert_eq!(snap2.state, CircuitState::Closed);
+
+        for _ in 0..3 {
+            let _: Result<(), CircuitError<u8>> = b.call(|| Err(1u8));
+        }
+        let snap3 = b.snapshot();
+        assert_eq!(snap3.state, CircuitState::Open);
+        assert_eq!(snap3.failures, 0); // reset on open()
     }
 }
