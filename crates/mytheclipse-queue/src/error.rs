@@ -11,6 +11,8 @@ pub enum QueueError {
     Serialization(String),
     /// A timeout occurred while waiting for an operation.
     Timeout,
+    /// The operation was rejected because of a rate limit.
+    RateLimit(String),
 }
 
 impl std::fmt::Display for QueueError {
@@ -20,6 +22,7 @@ impl std::fmt::Display for QueueError {
             Self::NotFound(s) => write!(f, "queue not found: {s}"),
             Self::Serialization(s) => write!(f, "serialization error: {s}"),
             Self::Timeout => write!(f, "queue operation timed out"),
+            Self::RateLimit(s) => write!(f, "queue rate limited: {s}"),
         }
     }
 }

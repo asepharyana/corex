@@ -59,7 +59,11 @@ pub mod batch;
 #[cfg(feature = "in-memory")]
 pub mod backpressure_enqueue;
 #[cfg(feature = "in-memory")]
+pub mod rate_limited;
+#[cfg(feature = "in-memory")]
 pub use backpressure_enqueue::{BackpressureEnforcer, BackpressureError, enqueue_with_backpressure};
+#[cfg(feature = "in-memory")]
+pub use rate_limited::{RateLimitedQueue, RateLimitQueueError};
 
 #[cfg(feature = "in-memory")]
 pub mod pipeline;

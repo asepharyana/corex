@@ -60,6 +60,12 @@ pub mod leader;
 #[cfg(feature = "lifecycle")]
 pub mod lifecycle;
 
+#[cfg(feature = "lifecycle")]
+pub mod bg_join;
+
+#[cfg(all(feature = "observability", feature = "resiliency"))]
+pub mod middleware;
+
 #[cfg(feature = "observability")]
 pub mod metrics;
 #[cfg(feature = "observability")]
@@ -129,6 +135,12 @@ pub use metrics_bridge::CircuitBreakerHealthCheck;
 /// Only compiled when both `observability` and `traffic` are enabled.
 #[cfg(all(feature = "observability", feature = "traffic"))]
 pub use pool_health::HealthCheckedPool;
+
+#[cfg(feature = "lifecycle")]
+pub use bg_join::BgJoiner;
+
+#[cfg(all(feature = "observability", feature = "resiliency"))]
+pub use middleware::{MiddlewarePipeline, PipelineError, BoxMiddleware, mw};
 #[cfg(feature = "observability")]
 pub use panic_tracker::{PanicGuard, PanicInfo, PanicTracker};
 
