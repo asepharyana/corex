@@ -61,6 +61,11 @@ pub mod metrics;
 #[cfg(feature = "observability")]
 pub mod panic_tracker;
 
+#[cfg(feature = "resiliency")]
+pub mod service_builder;
+#[cfg(feature = "lifecycle")]
+pub mod dlock;
+
 pub use context::{context, EngineContext};
 pub use error::MytheclipseError;
 
@@ -95,6 +100,12 @@ pub use cron::{schedule, CronError, CronJob, CronParseError, CronSchedule};
 pub use health::{HealthCheck, HealthRegistry, HealthStatus};
 #[cfg(feature = "lifecycle")]
 pub use leader::{InProcLeaderElection, LeaderElection};
+
+#[cfg(feature = "resiliency")]
+pub use service_builder::ServiceBuilder;
+
+#[cfg(feature = "lifecycle")]
+pub use dlock::{DistributedLock, LockError, LockGuard, InProcLock};
 
 #[cfg(feature = "observability")]
 pub use metrics::{MetricsCollector, MetricsSnapshot};

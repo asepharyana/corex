@@ -1,8 +1,6 @@
 //! Multipart upload trait for large-object uploads in parallel parts.
 
 use async_trait::async_trait;
-use std::pin::Pin;
-use tokio::io::AsyncRead;
 
 use crate::ObjectStream;
 

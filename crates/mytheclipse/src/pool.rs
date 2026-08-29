@@ -3,7 +3,6 @@
 //! Provides a `Pool` trait and a built-in `SemaphorePool<T>` implementation
 //! that distributes items drawn from a `Vec<T>` under a counting semaphore.
 
-use std::pin::Pin;
 use std::sync::Arc;
 
 use async_trait::async_trait;

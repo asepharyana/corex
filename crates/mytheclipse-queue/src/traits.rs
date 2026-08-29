@@ -13,7 +13,7 @@ use crate::error::{QueueError, JobError};
 /// count). `ack`/`nack` are only valid on backends that support explicit
 /// acknowledgment (NATS, Redis BLPOP-with-confirm). For in-memory and Postgres
 /// backends, the worker auto-acknowledges on `Ok` and auto-requeues on `Err`.
-
+///
 /// A trait for enqueueing and dequeueing jobs.
 ///
 /// Implementations must be `Send + Sync`. Each backend provides its own factory

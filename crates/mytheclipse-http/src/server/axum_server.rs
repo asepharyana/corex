@@ -5,7 +5,6 @@ use axum::{
     Router,
 };
 use std::net::SocketAddr;
-use std::time::Duration;
 
 /// A pre-configured HTTP server with health check and metrics endpoints.
 pub struct HttpServer {

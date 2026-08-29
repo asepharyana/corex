@@ -47,13 +47,13 @@
 //! # }
 //! ```
 
-pub mod traits;
-pub mod job;
-pub mod worker;
 pub mod error;
-
+pub mod job;
 #[cfg(feature = "in-memory")]
 pub mod in_memory;
+pub mod traits;
+pub mod worker;
+
 #[cfg(feature = "in-memory")]
 pub use in_memory::InMemoryQueue;
 
@@ -61,3 +61,8 @@ pub use traits::Queue;
 pub use job::{Job, JobId};
 pub use worker::{WorkerPool, WorkerConfig, JobHandler, JobFuture};
 pub use error::{QueueError, JobError};
+
+#[cfg(feature = "in-memory")]
+pub mod pipeline;
+#[cfg(feature = "in-memory")]
+pub use pipeline::{StageRunner, Stage, StageError};

@@ -137,7 +137,7 @@ where
 /// Computes the (jittered) delay to sleep before retry `attempt` (1-based).
 ///
 /// Kept as a pure function for testability.
-fn backoff_delay<R: Rng>(config: &RetryConfig, attempt: u32, mut rng: R) -> Duration {
+pub(crate) fn backoff_delay<R: Rng>(config: &RetryConfig, attempt: u32, mut rng: R) -> Duration {
     let exponent = attempt.saturating_sub(1) as f64; // first retry uses base
     let computed = config.base_delay.as_millis() as f64 * config.factor.powf(exponent);
     let max_ms = config.max_delay.as_millis() as f64;
