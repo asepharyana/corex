@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/asepharyana/mytheclipse/compare/v1.10.0...v1.11.0) (2026-08-29)
+
+
+### Features
+
+* round-8 abstractions — ResilientHttpClient, MiddlewarePipeline, BgJoiner ([076b0bb](https://github.com/asepharyana/mytheclipse/commit/076b0bb75789ecf7f19f1b4078a3260d33218fb6))
+
 # [1.10.0](https://github.com/asepharyana/mytheclipse/compare/v1.9.0...v1.10.0) (2026-08-29)
 
 
