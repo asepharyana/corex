@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/asepharyana/mytheclipse/compare/v1.15.0...v1.16.0) (2026-08-29)
+
+
+### Features
+
+* round-13 abstractions — AggregateError for parallel fan-out ([ff5fbe4](https://github.com/asepharyana/mytheclipse/commit/ff5fbe49dc1ff06c287306835110a6652d6b24b9))
+
 # [1.15.0](https://github.com/asepharyana/mytheclipse/compare/v1.14.0...v1.15.0) (2026-08-29)
 
 
