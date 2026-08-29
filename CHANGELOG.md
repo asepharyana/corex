@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/asepharyana/mytheclipse/compare/v1.13.0...v1.14.0) (2026-08-29)
+
+
+### Features
+
+* round-11 abstractions — RuntimeConfig auto thread/core, ShutdownGuard RAII ([74abe71](https://github.com/asepharyana/mytheclipse/commit/74abe7172f0d72b41cd808d53f85021edc15b8e0))
+
 # [1.13.0](https://github.com/asepharyana/mytheclipse/compare/v1.12.0...v1.13.0) (2026-08-29)
 
 
