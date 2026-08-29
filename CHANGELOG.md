@@ -1,3 +1,10 @@
+## [1.21.1](https://github.com/asepharyana/mytheclipse/compare/v1.21.0...v1.21.1) (2026-08-29)
+
+
+### Bug Fixes
+
+* **ci:** restore full CI green — test-matrix, clippy, rustfmt, and rustdoc gates ([1dfc6d6](https://github.com/asepharyana/mytheclipse/commit/1dfc6d68657e5b002896f400d744b052800c9285))
+
 # [1.21.0](https://github.com/asepharyana/mytheclipse/compare/v1.20.0...v1.21.0) (2026-08-29)
 
 
