@@ -21,6 +21,8 @@ client = ["dep:reqwest", "dep:tokio"]
 server-hyper = ["dep:hyper", "dep:tokio"]
 # Server backed by axum.
 server-axum = ["dep:axum", "dep:hyper", "dep:tokio"]
+# Metrics HTTP endpoint serving Prometheus text format from a MetricsCollector.
+metrics-http = ["dep:axum", "dep:tower", "dep:tokio", "dep:mytheclipse"]
 
 [dependencies]
 tracing = "0.1"
@@ -29,8 +31,10 @@ tokio = { version = "1.53", features = ["sync", "time", "rt", "macros"], optiona
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"], optional = true }
 hyper = { version = "1", features = ["full"], optional = true }
 axum = { version = "0.8", optional = true }
+tower = { version = "0.5", optional = true, default-features = false, features = ["util"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+mytheclipse = { version = "1.5", path = "../mytheclipse", optional = true, default-features = false, features = ["observability"] }
 
 [dev-dependencies]
 tokio = { version = "1.53", features = ["full"] }

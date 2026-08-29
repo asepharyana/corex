@@ -42,6 +42,7 @@
 //! ```
 
 pub mod key_ring;
+pub mod key_registry;
 
 #[cfg(feature = "password")]
 pub mod password;
@@ -68,6 +69,7 @@ pub use token::{Claims, TokenError, TokenSigner};
 pub use paseto::{PasetoSigner, PasetoClaims};
 
 pub use key_ring::KeyRing;
+pub use key_registry::TypedKeyRegistry;
 
 /// Errors returned across mytheclipse-crypto primitives.
 #[non_exhaustive]

@@ -117,6 +117,11 @@ pub use lifecycle::AsyncLifecycleManager;
 pub use metrics::{MetricsCollector, MetricsSnapshot};
 #[cfg(feature = "observability")]
 pub use metrics_bridge::{MetricsBridge, MetricsHealthCheck};
+
+/// Re-export of [`metrics_bridge::CircuitBreakerHealthCheck`].
+/// Only compiled when both `observability` and `resiliency` are enabled.
+#[cfg(all(feature = "observability", feature = "resiliency"))]
+pub use metrics_bridge::CircuitBreakerHealthCheck;
 #[cfg(feature = "observability")]
 pub use panic_tracker::{PanicGuard, PanicInfo, PanicTracker};
 

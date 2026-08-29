@@ -17,3 +17,9 @@ pub use client::HttpClient;
 
 #[cfg(feature = "server-axum")]
 pub mod server;
+
+#[cfg(feature = "metrics-http")]
+pub mod metrics_http;
+
+#[cfg(feature = "metrics-http")]
+pub use metrics_http::metrics_routes;

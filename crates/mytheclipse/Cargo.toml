@@ -34,7 +34,7 @@ bg = ["dep:tokio"]
 resiliency = ["dep:tokio", "dep:rand"]
 traffic = ["dep:tokio"]
 lifecycle = ["dep:tokio"]
-observability = ["dep:tokio"]
+observability = ["dep:tokio", "lifecycle"]
 full = ["io", "compute", "bg", "resiliency", "traffic", "lifecycle", "observability"]
 
 [[example]]

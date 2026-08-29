@@ -10,6 +10,41 @@ use std::time::Duration;
 use crate::health::{HealthCheck, HealthStatus};
 use crate::metrics::MetricsCollector;
 
+/// A health check backed by a [`CircuitBreaker`]: unhealthy if open,
+/// degraded if half-open, ok otherwise.
+///
+/// Only available when both `resiliency` and `observability` features are
+/// enabled (circuit breaker + health/metrics bridge).
+#[cfg(feature = "resiliency")]
+pub struct CircuitBreakerHealthCheck {
+    breaker: crate::circuit_breaker::CircuitBreaker,
+}
+
+#[cfg(feature = "resiliency")]
+impl CircuitBreakerHealthCheck {
+    pub fn new(breaker: crate::circuit_breaker::CircuitBreaker) -> Self {
+        Self { breaker }
+    }
+}
+
+#[cfg(feature = "resiliency")]
+impl HealthCheck for CircuitBreakerHealthCheck {
+    fn name(&self) -> &str {
+        "circuit_breaker"
+    }
+
+    fn check(&self) -> std::pin::Pin<Box<dyn std::future::Future<Output = HealthStatus> + Send + '_>> {
+        let state = self.breaker.snapshot().state;
+        Box::pin(async move {
+            match state {
+                crate::circuit_breaker::CircuitState::Open => HealthStatus::Unhealthy,
+                crate::circuit_breaker::CircuitState::HalfOpen => HealthStatus::Degraded,
+                crate::circuit_breaker::CircuitState::Closed => HealthStatus::Ok,
+            }
+        })
+    }
+}
+
 /// A health check backed by a [`MetricsCollector`]: unhealthy if any registered
 /// "error" counter is non-zero, degraded if any gauge is below a configured
 /// threshold.
@@ -142,6 +177,7 @@ mod tests {
         bridge.emit_now();
     }
 
+#[cfg(feature = "lifecycle")]
     #[tokio::test]
     async fn lifecycle_manager_with_metrics_bridge() {
         let collector = MetricsCollector::new();
