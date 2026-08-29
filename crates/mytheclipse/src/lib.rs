@@ -70,6 +70,15 @@ pub mod lifecycle;
 
 #[cfg(feature = "lifecycle")]
 pub mod bg_join;
+#[cfg(feature = "lifecycle")]
+pub mod runtime_auto;
+#[cfg(feature = "lifecycle")]
+pub use runtime_auto::{available_parallelism, RuntimeConfig};
+
+#[cfg(feature = "lifecycle")]
+pub mod shutdown_guard;
+#[cfg(feature = "lifecycle")]
+pub use shutdown_guard::ShutdownGuard;
 
 #[cfg(all(feature = "observability", feature = "resiliency"))]
 pub mod middleware;
