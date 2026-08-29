@@ -40,6 +40,9 @@ pub mod loader;
 #[cfg(feature = "hot-reload")]
 pub mod dynamic;
 
+#[cfg(feature = "schema")]
+pub mod schema;
+
 pub use error::ConfigError;
 pub use loader::ConfigLoader;
 

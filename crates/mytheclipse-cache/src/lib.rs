@@ -60,6 +60,12 @@ pub mod cache_aside;
 #[cfg(feature = "cache-aside")]
 pub mod multilayer;
 
+#[cfg(feature = "cache-aside")]
+pub mod auto_refresh;
+
+#[cfg(feature = "cache-aside")]
+pub mod metrics;
+
 pub use traits::{Cache, CacheError};
 
 #[cfg(feature = "l1-memory")]

@@ -14,7 +14,7 @@ keywords = ["storage", "s3", "gcs", "minio", "filesystem"]
 categories = ["filesystem", "asynchronous"]
 
 [features]
-default = ["local"]
+default = ["local", "multipart"]
 # The core `StorageDriver` trait (always compiled) needs `tokio`'s io-util for
 # `AsyncRead`/`ReadBuf`; `local` additionally needs `fs`/`rt`.
 local = ["tokio/fs", "tokio/rt"]
@@ -22,6 +22,7 @@ local = ["tokio/fs", "tokio/rt"]
 s3 = ["dep:aws-sdk-s3", "dep:aws-config", "dep:aws-credential-types"]
 # Google Cloud Storage.
 gcs = ["dep:google-cloud-storage", "dep:google-cloud-auth"]
+multipart = []
 
 [dependencies]
 tracing = "0.1"

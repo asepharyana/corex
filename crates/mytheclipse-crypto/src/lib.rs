@@ -52,6 +52,9 @@ pub mod encryption;
 #[cfg(feature = "tokens")]
 pub mod token;
 
+#[cfg(feature = "paseto")]
+pub mod paseto;
+
 #[cfg(feature = "password")]
 pub use password::PasswordHasher;
 
@@ -60,6 +63,9 @@ pub use encryption::{AeadError, Encryptor};
 
 #[cfg(feature = "tokens")]
 pub use token::{Claims, TokenError, TokenSigner};
+
+#[cfg(feature = "paseto")]
+pub use paseto::{PasetoSigner, PasetoClaims};
 
 pub use key_ring::KeyRing;
 

@@ -44,6 +44,9 @@ pub mod s3;
 #[cfg(feature = "gcs")]
 pub mod gcs;
 
+#[cfg(feature = "multipart")]
+pub mod multipart;
+
 pub use traits::{
     bytes_stream, read_to_vec, ObjectMeta, ObjectStream, StorageDriver, StorageError,
 };
@@ -56,3 +59,6 @@ pub use s3::S3Storage;
 
 #[cfg(feature = "gcs")]
 pub use gcs::GcsStorage;
+
+#[cfg(feature = "multipart")]
+pub use multipart::{MultipartUpload, MultipartUploadDriver, UploadPart};

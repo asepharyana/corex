@@ -23,6 +23,8 @@ yaml = ["dep:serde_yaml"]
 toml = ["dep:toml"]
 # Watch config files and hot-reload.
 hot-reload = ["dep:notify", "dep:tokio"]
+# JSON Schema generation for config validation and docs.
+schema = []
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }

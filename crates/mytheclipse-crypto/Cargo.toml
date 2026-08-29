@@ -8,7 +8,7 @@ repository = "https://github.com/asepharyana/mytheclipse"
 homepage = "https://github.com/asepharyana/mytheclipse"
 documentation = "https://docs.rs/mytheclipse-crypto"
 authors = ["asepharyana <superaseph@gmail.com>"]
-description = "Safe hashing, encryption, and token helpers (Argon2id, AES-256-GCM, JWT/Paseto) with key rotation support."
+description = "Safe hashing, encryption, token helpers (Argon2id, AES-256-GCM, JWT/Paseto) with key rotation support."
 readme = "README.md"
 keywords = ["crypto", "argon2", "aes-gcm", "jwt", "security"]
 categories = ["cryptography", "authentication"]
@@ -20,6 +20,8 @@ default = ["password", "encryption", "tokens"]
 password = ["dep:password-hash", "dep:argon2"]
 encryption = ["dep:aead", "dep:aes-gcm", "dep:rand_core", "dep:rand"]
 tokens = ["encryption", "dep:serde", "dep:serde_json", "dep:base64", "dep:jsonwebtoken"]
+paseto = ["encryption", "dep:serde", "dep:serde_json", "dep:base64", "dep:pasetors"]
+rate-limit = ["dep:hashbrown", "dep:tokio"]
 
 [dependencies]
 tracing = "0.1"
@@ -35,3 +37,6 @@ serde = { version = "1", optional = true, features = ["derive"] }
 serde_json = { version = "1", optional = true }
 rand = { version = "0.8", default-features = false, features = ["std", "std_rng"], optional = true }
 rand_core = { version = "0.6", optional = true }
+pasetors = { version = "0.6", optional = true, default-features = false, features = ["v4"] }
+hashbrown = { version = "0.15", optional = true }
+tokio = { version = "1.53", features = ["sync", "time"], optional = true }

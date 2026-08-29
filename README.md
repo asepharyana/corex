@@ -16,7 +16,11 @@ concern.
 | [`mytheclipse-storage`](crates/mytheclipse-storage) | Unified storage & file system abstraction: one driver interface over local disk, S3/MinIO, and Google Cloud Storage, stream-based. | [README](crates/mytheclipse-storage/README.md) |
 | [`mytheclipse-event`](crates/mytheclipse-event) | Unified events & message bus abstraction: in-memory pub/sub dispatcher plus RabbitMQ and NATS broker adapters behind one trait. | [README](crates/mytheclipse-event/README.md) |
 | [`mytheclipse-config`](crates/mytheclipse-config) | Type-safe, dynamic configuration engine: load `.env`/YAML/JSON/TOML into typed structs, with hot-reload. | [README](crates/mytheclipse-config/README.md) |
-| [`mytheclipse-crypto`](crates/mytheclipse-crypto) | Safe hashing (Argon2id), encryption (AES-256-GCM), and JWT tokens, with key rotation support. | [README](crates/mytheclipse-crypto/README.md) |
+| [`mytheclipse-crypto`](crates/mytheclipse-crypto) | Safe hashing (Argon2id), encryption (AES-256-GCM), JWT and PASETO tokens, with key rotation support. | [README](crates/mytheclipse-crypto/README.md) |
+| [`mytheclipse-queue`](crates/mytheclipse-queue) | Unified job queue abstraction with WorkerPool executor, retry/backoff, and dead-letter support. Backends: in-memory, Redis, NATS, PostgreSQL. | [README](crates/mytheclipse-queue/README.md) |
+| [`mytheclipse-tracing`](crates/mytheclipse-tracing) | Pre-built tracing subscriber layers with env filtering and optional OTLP/Jaeger/Zipkin export. | [README](crates/mytheclipse-tracing/README.md) |
+| [`mytheclipse-http`](crates/mytheclipse-http) | HTTP client and server abstraction with built-in retry, circuit breaker, timeout, and rate limiting. | [README](crates/mytheclipse-http/README.md) |
+| [`mytheclipse-cli`](crates/mytheclipse-cli) | CLI framework for mytheclipse applications with built-in subcommands (serve, worker, migrate, health, version). | [README](crates/mytheclipse-cli/README.md) |
 
 Every crate follows the same philosophy: **one small interface, pluggable
 backends behind feature flags, and a working default that needs no external
