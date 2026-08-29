@@ -25,6 +25,7 @@ thiserror = "2"
 [dev-dependencies]
 tokio = { version = "1.53", features = ["full"] }
 tracing-subscriber = "0.3"
+criterion = { version = "0.5", features = ["async_tokio"] }
 
 [features]
 default = []
@@ -40,6 +41,12 @@ full = ["io", "compute", "bg", "resiliency", "traffic", "lifecycle", "observabil
 [[example]]
 name = "main"
 path = "examples/main.rs"
+required-features = ["full"]
+
+[[bench]]
+name = "primitives"
+path = "benches/primitives.rs"
+harness = false
 required-features = ["full"]
 
 [package.metadata.docs.rs]
