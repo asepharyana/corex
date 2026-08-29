@@ -1,3 +1,10 @@
+# [1.19.0](https://github.com/asepharyana/mytheclipse/compare/v1.18.0...v1.19.0) (2026-08-29)
+
+
+### Features
+
+* criterion benchmarks proving primitive overhead is negligible ([5df04d7](https://github.com/asepharyana/mytheclipse/commit/5df04d75126d71d0790028c4a215acb571f25616))
+
 # [1.18.0](https://github.com/asepharyana/mytheclipse/compare/v1.17.0...v1.18.0) (2026-08-29)
 
 
