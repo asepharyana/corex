@@ -1,3 +1,10 @@
+# [1.21.0](https://github.com/asepharyana/mytheclipse/compare/v1.20.0...v1.21.0) (2026-08-29)
+
+
+### Features
+
+* CPU parallel compute primitives — compute_map, compute_join, compute_par_for_each ([e148944](https://github.com/asepharyana/mytheclipse/commit/e14894479d8ca716a9decf2c1403359fdc376717))
+
 # [1.20.0](https://github.com/asepharyana/mytheclipse/compare/v1.19.0...v1.20.0) (2026-08-29)
 
 
