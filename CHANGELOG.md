@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/asepharyana/mytheclipse/compare/v1.11.0...v1.12.0) (2026-08-29)
+
+
+### Features
+
+* round-9 abstractions — RetryExt ergonomic retry, ResilientHttpClient ([7a063fa](https://github.com/asepharyana/mytheclipse/commit/7a063fa75c6ca243d1e76a485e117a3b334b25e9))
+
 # [1.11.0](https://github.com/asepharyana/mytheclipse/compare/v1.10.0...v1.11.0) (2026-08-29)
 
 
