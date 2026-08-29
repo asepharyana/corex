@@ -43,8 +43,18 @@ pub mod dynamic;
 #[cfg(feature = "schema")]
 pub mod schema;
 
+#[cfg(feature = "validation")]
+pub mod validate;
+
 pub use error::ConfigError;
 pub use loader::ConfigLoader;
+
+#[cfg(feature = "validation")]
+pub use validate::{
+    collect_failures, validate_non_empty, validate_port, validate_range,
+    validate_url, ConfigValidator, ConfigValidatorExt, ValidationError,
+    ValidationFailure,
+};
 
 #[cfg(feature = "hot-reload")]
 pub use dynamic::DynamicConfig;

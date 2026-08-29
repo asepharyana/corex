@@ -15,6 +15,8 @@ pub enum ConfigError {
     UnsupportedFormat(String),
     /// Hot-reload setup failed (e.g. the file watcher could not be installed).
     Watch(String),
+    /// Config validation failed after loading.
+    Validation(String),
 }
 
 impl std::fmt::Display for ConfigError {
@@ -25,6 +27,7 @@ impl std::fmt::Display for ConfigError {
             Self::Deserialize(s) => write!(f, "config deserialize error: {s}"),
             Self::UnsupportedFormat(s) => write!(f, "unsupported config format: {s}"),
             Self::Watch(s) => write!(f, "config watch error: {s}"),
+            Self::Validation(s) => write!(f, "config validation error: {s}"),
         }
     }
 }

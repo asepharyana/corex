@@ -55,11 +55,15 @@ pub mod cron;
 pub mod health;
 #[cfg(feature = "lifecycle")]
 pub mod leader;
+#[cfg(feature = "lifecycle")]
+pub mod lifecycle;
 
 #[cfg(feature = "observability")]
 pub mod metrics;
 #[cfg(feature = "observability")]
 pub mod panic_tracker;
+#[cfg(feature = "observability")]
+pub mod metrics_bridge;
 
 #[cfg(feature = "resiliency")]
 pub mod service_builder;
@@ -106,9 +110,13 @@ pub use service_builder::ServiceBuilder;
 
 #[cfg(feature = "lifecycle")]
 pub use dlock::{DistributedLock, LockError, LockGuard, InProcLock};
+#[cfg(feature = "lifecycle")]
+pub use lifecycle::AsyncLifecycleManager;
 
 #[cfg(feature = "observability")]
 pub use metrics::{MetricsCollector, MetricsSnapshot};
+#[cfg(feature = "observability")]
+pub use metrics_bridge::{MetricsBridge, MetricsHealthCheck};
 #[cfg(feature = "observability")]
 pub use panic_tracker::{PanicGuard, PanicInfo, PanicTracker};
 
