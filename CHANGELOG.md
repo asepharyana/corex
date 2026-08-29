@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/asepharyana/mytheclipse/compare/v1.4.0...v1.4.1) (2026-08-29)
+
+
+### Bug Fixes
+
+* clippy clean for round-2 (pipeline module export, lint cleanup) ([1981544](https://github.com/asepharyana/mytheclipse/commit/198154442c4297c94e8743caec81294b478c0d3a))
+
 # [1.4.0](https://github.com/asepharyana/mytheclipse/compare/v1.3.5...v1.4.0) (2026-08-29)
 
 
