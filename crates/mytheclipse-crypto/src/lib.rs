@@ -55,6 +55,8 @@ pub mod token;
 
 #[cfg(feature = "paseto")]
 pub mod paseto;
+#[cfg(feature = "derivation")]
+pub mod hkdf;
 
 #[cfg(feature = "password")]
 pub use password::PasswordHasher;
@@ -70,6 +72,9 @@ pub use paseto::{PasetoSigner, PasetoClaims};
 
 pub use key_ring::KeyRing;
 pub use key_registry::TypedKeyRegistry;
+
+#[cfg(feature = "derivation")]
+pub use hkdf::HkdfKeyDeriver;
 
 /// Errors returned across mytheclipse-crypto primitives.
 #[non_exhaustive]

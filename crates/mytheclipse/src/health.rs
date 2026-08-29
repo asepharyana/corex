@@ -36,7 +36,7 @@ struct RegisteredCheck {
 }
 
 /// Registry of health checks for aggregated /health reporting.
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct HealthRegistry {
     checks: Arc<RwLock<Vec<RegisteredCheck>>>,
 }

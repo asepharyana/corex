@@ -22,6 +22,8 @@ encryption = ["dep:aead", "dep:aes-gcm", "dep:rand_core", "dep:rand"]
 tokens = ["encryption", "dep:serde", "dep:serde_json", "dep:base64", "dep:jsonwebtoken"]
 paseto = ["encryption", "dep:serde", "dep:serde_json", "dep:base64", "dep:pasetors"]
 rate-limit = ["dep:hashbrown", "dep:tokio"]
+# HKDF-SHA256 key derivation (RFC 5869).
+derivation = ["dep:hkdf", "dep:sha2"]
 
 [dependencies]
 tracing = "0.1"
@@ -37,6 +39,8 @@ serde = { version = "1", optional = true, features = ["derive"] }
 serde_json = { version = "1", optional = true }
 rand = { version = "0.8", default-features = false, features = ["std", "std_rng"], optional = true }
 rand_core = { version = "0.6", optional = true }
+hkdf = { version = "0.12", default-features = false, optional = true }
+sha2 = { version = "0.10", optional = true }
 pasetors = { version = "0.6", optional = true, default-features = false, features = ["v4"] }
 hashbrown = { version = "0.15", optional = true }
 tokio = { version = "1.53", features = ["sync", "time"], optional = true }

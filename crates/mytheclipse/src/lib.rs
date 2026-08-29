@@ -53,6 +53,8 @@ pub mod shutdown;
 pub mod cron;
 #[cfg(feature = "lifecycle")]
 pub mod health;
+#[cfg(all(feature = "observability", feature = "traffic"))]
+pub mod pool_health;
 #[cfg(feature = "lifecycle")]
 pub mod leader;
 #[cfg(feature = "lifecycle")]
@@ -122,6 +124,11 @@ pub use metrics_bridge::{MetricsBridge, MetricsHealthCheck};
 /// Only compiled when both `observability` and `resiliency` are enabled.
 #[cfg(all(feature = "observability", feature = "resiliency"))]
 pub use metrics_bridge::CircuitBreakerHealthCheck;
+
+/// Re-export of [`pool_health::HealthCheckedPool`].
+/// Only compiled when both `observability` and `traffic` are enabled.
+#[cfg(all(feature = "observability", feature = "traffic"))]
+pub use pool_health::HealthCheckedPool;
 #[cfg(feature = "observability")]
 pub use panic_tracker::{PanicGuard, PanicInfo, PanicTracker};
 

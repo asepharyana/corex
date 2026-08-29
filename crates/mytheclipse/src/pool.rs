@@ -3,11 +3,14 @@
 //! Provides a `Pool` trait and a built-in `SemaphorePool<T>` implementation
 //! that distributes items drawn from a `Vec<T>` under a counting semaphore.
 
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
 use async_trait::async_trait;
 use tokio::sync::OwnedSemaphorePermit;
 use tokio::sync::Semaphore;
+
+static ACQUIRE_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 /// Errors returned by pool operations.
 #[derive(Debug, thiserror::Error)]
@@ -39,6 +42,11 @@ pub struct SemaphorePool<T: Clone> {
 }
 
 impl<T: Clone> SemaphorePool<T> {
+    /// Returns the underlying items slice (read-only view).
+    pub fn items(&self) -> &[T] {
+        &self.items
+    }
+
     /// Creates a new pool from a vector of items.
     pub fn new(items: Vec<T>) -> Self {
         let permits = items.len().max(1);
@@ -54,7 +62,7 @@ impl<T: Clone + Send + Sync + 'static> Pool<T> for SemaphorePool<T> {
     async fn acquire(&self) -> Result<Pooled<T>, PoolError> {
         let permit = self.semaphore.clone().acquire_owned().await
             .map_err(|_| PoolError::Exhausted)?;
-        let idx = rand::random::<usize>() % self.items.len();
+        let idx = ACQUIRE_COUNT.fetch_add(1, Ordering::Relaxed) % self.items.len();
         Ok(Pooled {
             resource: self.items[idx].clone(),
             _permit: permit,
