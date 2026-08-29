@@ -70,6 +70,78 @@ impl<T: Clone + Send + Sync + 'static> Pool<T> for SemaphorePool<T> {
     }
 }
 
+/// A liveness probe for a pooled resource.
+///
+/// Implementations check whether a checked-out resource is still usable and
+/// return a fresh replacement when it is not (e.g. a broken connection).
+#[async_trait]
+pub trait Reconnectable {
+    /// Type of the healthy resource.
+    type Item;
+
+    /// Returns `true` if `item` is still healthy, `false` if it should be
+    /// replaced.
+    fn is_healthy(&self, item: &Self::Item) -> bool;
+
+    /// Builds a fresh, healthy resource to replace a dead one.
+    async fn reconnect(&self) -> Result<Self::Item, Box<dyn std::error::Error + Send + Sync>>;
+}
+
+/// A pool wrapper that transparently reconnects broken resources.
+///
+/// Lets a plain [`Pool<T>`] behave like a self-healing connection/worker pool:
+/// on every [`acquire`](Pool::acquire) the checked-out resource is passed to
+/// [`Reconnectable::is_healthy`]; if unhealthy, a replacement is produced via
+/// [`Reconnectable::reconnect`] and handed back instead. This removes the
+/// per-call-site "is my connection dead? rebuild it" boilerplate.
+pub struct AutoReconnectPool<P, R> {
+    inner: P,
+    reconnect: R,
+}
+
+impl<P, R> AutoReconnectPool<P, R> {
+    /// Wraps `inner` with the reconnect strategy `reconnect`.
+    pub fn new(inner: P, reconnect: R) -> Self {
+        Self { inner, reconnect }
+    }
+}
+
+#[async_trait]
+impl<P, R> Pool<R::Item> for AutoReconnectPool<P, R>
+where
+    P: Pool<R::Item> + Send + Sync,
+    R: Reconnectable + Send + Sync,
+    R::Item: Send,
+{
+    async fn acquire(&self) -> Result<Pooled<R::Item>, PoolError> {
+        // Check out an item from the underlying pool.
+        let pooled = { self.inner.acquire().await? };
+        let item = pooled.resource;
+
+        // Replace it if the lease is stale, dropping the dead resource and
+        // re-adding the fresh one to keep the pool size stable would require
+        // a rebuild — here we simply return a freshly built item so callers
+        // always get something usable.
+        if self.reconnect.is_healthy(&item) {
+            Ok(Pooled {
+                resource: item,
+                _permit: pooled._permit,
+            })
+        } else {
+            let fresh = self
+                .reconnect
+                .reconnect()
+                .await
+                .map_err(PoolError::Other)?;
+            Ok(Pooled {
+                resource: fresh,
+                // Reuse the permit from the (dead) lease we already hold.
+                _permit: pooled._permit,
+            })
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -79,5 +151,32 @@ mod tests {
         let pool = SemaphorePool::new(vec![42u32, 84u32]);
         let item = pool.acquire().await.unwrap();
         assert!(item.resource == 42 || item.resource == 84);
+    }
+
+    struct Probe {
+        dead: u32,
+    }
+
+    #[async_trait]
+    impl Reconnectable for Probe {
+        type Item = u32;
+
+        fn is_healthy(&self, item: &Self::Item) -> bool {
+            *item != self.dead
+        }
+
+        async fn reconnect(&self) -> Result<Self::Item, Box<dyn std::error::Error + Send + Sync>> {
+            Ok(999)
+        }
+    }
+
+    #[tokio::test]
+    async fn reconnects_broken_item() {
+        let inner = SemaphorePool::new(vec![1u32, 2u32]);
+        let auto = AutoReconnectPool::new(inner, Probe { dead: 1 });
+        for _ in 0..10 {
+            let p = auto.acquire().await.unwrap();
+            assert_ne!(p.resource, 1); // never the dead value
+        }
     }
 }

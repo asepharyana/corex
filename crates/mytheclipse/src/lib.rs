@@ -119,7 +119,7 @@ pub use backpressure::{BackpressureError, BackpressureQueue, OverflowPolicy};
 #[cfg(feature = "traffic")]
 pub use concurrency::{ConcurrencyLimiter, ConcurrencyPermit};
 #[cfg(feature = "traffic")]
-pub use pool::{Pool, PoolError, Pooled, SemaphorePool};
+pub use pool::{Pool, PoolError, Pooled, SemaphorePool, AutoReconnectPool, Reconnectable};
 
 #[cfg(feature = "lifecycle")]
 pub use shutdown::{ShutdownManager, ShutdownSignal};
