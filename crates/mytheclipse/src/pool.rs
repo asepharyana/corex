@@ -60,7 +60,11 @@ impl<T: Clone> SemaphorePool<T> {
 #[async_trait]
 impl<T: Clone + Send + Sync + 'static> Pool<T> for SemaphorePool<T> {
     async fn acquire(&self) -> Result<Pooled<T>, PoolError> {
-        let permit = self.semaphore.clone().acquire_owned().await
+        let permit = self
+            .semaphore
+            .clone()
+            .acquire_owned()
+            .await
             .map_err(|_| PoolError::Exhausted)?;
         let idx = ACQUIRE_COUNT.fetch_add(1, Ordering::Relaxed) % self.items.len();
         Ok(Pooled {
@@ -158,11 +162,7 @@ where
                 _permit: pooled._permit,
             })
         } else {
-            let fresh = self
-                .reconnect
-                .reconnect()
-                .await
-                .map_err(PoolError::Other)?;
+            let fresh = self.reconnect.reconnect().await.map_err(PoolError::Other)?;
             Ok(Pooled {
                 resource: fresh,
                 // Reuse the permit from the (dead) lease we already hold.

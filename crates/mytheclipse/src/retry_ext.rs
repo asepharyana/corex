@@ -76,21 +76,29 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::Duration;
-    use std::sync::Arc;
     use std::sync::atomic::{AtomicU32, Ordering};
+    use std::sync::Arc;
+    use std::time::Duration;
 
     #[tokio::test]
     async fn retry_ext_retries_then_succeeds() {
         let attempts = Arc::new(AtomicU32::new(0));
         let a = Arc::clone(&attempts);
-        let cfg = RetryConfig { max_attempts: 3, base_delay: Duration::from_millis(1), ..RetryConfig::default() };
+        let cfg = RetryConfig {
+            max_attempts: 3,
+            base_delay: Duration::from_millis(1),
+            ..RetryConfig::default()
+        };
 
         let op = move || {
             let a = Arc::clone(&a);
             async move {
                 let n = a.fetch_add(1, Ordering::SeqCst);
-                if n < 2 { Err::<(), String>("transient".into()) } else { Ok(()) }
+                if n < 2 {
+                    Err::<(), String>("transient".into())
+                } else {
+                    Ok(())
+                }
             }
         };
 

@@ -37,8 +37,12 @@ use std::sync::{Arc, Mutex};
 /// ShutdownGuard::new(move || { d2.fetch_add(1, Ordering::SeqCst); }).finish();
 /// assert_eq!(done.load(Ordering::SeqCst), 2);
 /// ```
+// Type alias for the stored once-only callback, so the nested Arc<Mutex<…>> field type
+// stays within clippy's `type_complexity` threshold.
+type GuardFn = Box<dyn FnOnce() + Send>;
+
 pub struct ShutdownGuard {
-    inner: Arc<Mutex<Option<Box<dyn FnOnce() + Send>>>>,
+    inner: Arc<Mutex<Option<GuardFn>>>,
 }
 
 impl ShutdownGuard {

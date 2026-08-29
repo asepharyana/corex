@@ -16,7 +16,10 @@ use mytheclipse::parallel_map::{parallel_for_each, ParallelConcurrency};
 #[tokio::main]
 async fn main() {
     let total = 100u32;
-    println!("host available_parallelism = {}", <() as ParallelConcurrency>::resolve(()));
+    println!(
+        "host available_parallelism = {}",
+        <() as ParallelConcurrency>::resolve(())
+    );
     println!("total items = {total}");
     println!();
 
@@ -49,6 +52,12 @@ async fn run(label: &str, concurrency: impl ParallelConcurrency + Copy, total: u
     let elapsed = start.elapsed();
 
     println!("{label}  resolved={resolved}");
-    println!("  peak in-flight = {} (bounded, never {total})", peak.load(Ordering::SeqCst));
-    println!("  elapsed        = {elapsed:?}  (sequential ~{}ms)", total * 1);
+    println!(
+        "  peak in-flight = {} (bounded, never {total})",
+        peak.load(Ordering::SeqCst)
+    );
+    println!(
+        "  elapsed        = {elapsed:?}  (sequential ~{}ms)",
+        total * 1
+    );
 }

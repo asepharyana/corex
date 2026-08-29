@@ -4,8 +4,8 @@
 //! domain-specific sub-keys from a single master secret. Each purpose
 //! string acts as the `info` parameter for domain separation.
 
-use sha2::Sha256;
 use hkdf::Hkdf;
+use sha2::Sha256;
 
 /// Derives sub-keys from a master secret using HKDF-SHA256.
 pub struct HkdfKeyDeriver {

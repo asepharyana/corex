@@ -111,7 +111,11 @@ impl<Q: Queue + ?Sized> Queue for RateLimitedQueue<Q> {
         self.inner.enqueue(topic, payload).await
     }
 
-    async fn dequeue(&self, topic: &str, timeout: Duration) -> Result<Option<crate::job::Job>, QueueError> {
+    async fn dequeue(
+        &self,
+        topic: &str,
+        timeout: Duration,
+    ) -> Result<Option<crate::job::Job>, QueueError> {
         self.inner.dequeue(topic, timeout).await
     }
 
@@ -119,7 +123,11 @@ impl<Q: Queue + ?Sized> Queue for RateLimitedQueue<Q> {
         self.inner.ack(job).await
     }
 
-    async fn nack(&self, job: &crate::job::Job, requeue: bool) -> Result<(), crate::error::JobError> {
+    async fn nack(
+        &self,
+        job: &crate::job::Job,
+        requeue: bool,
+    ) -> Result<(), crate::error::JobError> {
         self.inner.nack(job, requeue).await
     }
 
@@ -148,7 +156,7 @@ mod tests {
     async fn rejects_when_bucket_empty() {
         let inner = InMemoryQueue::new();
         let rl = RateLimitedQueue::new(inner, 0.0, 1); // 0 tokens/sec, 1 burst
-        // consume the single burst token
+                                                       // consume the single burst token
         let _ = rl.enqueue("t", b"x".to_vec()).await;
         // next should be rate limited (no refill)
         let result = rl.enqueue("t", b"y".to_vec()).await;

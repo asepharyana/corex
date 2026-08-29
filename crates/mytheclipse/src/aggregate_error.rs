@@ -117,12 +117,18 @@ impl std::error::Error for AggregateError {}
 
 impl From<Vec<Box<dyn std::error::Error + Send + Sync>>> for AggregateError {
     fn from(errors: Vec<Box<dyn std::error::Error + Send + Sync>>) -> Self {
-        Self { errors, context: None }
+        Self {
+            errors,
+            context: None,
+        }
     }
 }
 
 impl Extend<Box<dyn std::error::Error + Send + Sync>> for AggregateError {
-    fn extend<T: IntoIterator<Item = Box<dyn std::error::Error + Send + Sync>>>(&mut self, iter: T) {
+    fn extend<T: IntoIterator<Item = Box<dyn std::error::Error + Send + Sync>>>(
+        &mut self,
+        iter: T,
+    ) {
         self.errors.extend(iter);
     }
 }
@@ -160,8 +166,7 @@ mod tests {
 
     #[test]
     fn collects_values_when_all_ok() {
-        let results: Vec<Result<u32, std::io::Error>> =
-            vec![Ok(1), Ok(2), Ok(3)];
+        let results: Vec<Result<u32, std::io::Error>> = vec![Ok(1), Ok(2), Ok(3)];
         let out = AggregateError::from_results(results).unwrap();
         assert_eq!(out, vec![1, 2, 3]);
     }

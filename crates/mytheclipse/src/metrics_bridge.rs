@@ -10,8 +10,8 @@ use std::time::Duration;
 use crate::health::{HealthCheck, HealthStatus};
 use crate::metrics::MetricsCollector;
 
-/// A health check backed by a [`CircuitBreaker`]: unhealthy if open,
-/// degraded if half-open, ok otherwise.
+/// A health check backed by a [`crate::circuit_breaker::CircuitBreaker`]:
+/// unhealthy if open, degraded if half-open, ok otherwise.
 ///
 /// Only available when both `resiliency` and `observability` features are
 /// enabled (circuit breaker + health/metrics bridge).
@@ -33,7 +33,9 @@ impl HealthCheck for CircuitBreakerHealthCheck {
         "circuit_breaker"
     }
 
-    fn check(&self) -> std::pin::Pin<Box<dyn std::future::Future<Output = HealthStatus> + Send + '_>> {
+    fn check(
+        &self,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = HealthStatus> + Send + '_>> {
         let state = self.breaker.snapshot().state;
         Box::pin(async move {
             match state {
@@ -63,11 +65,7 @@ impl MetricsHealthCheck {
     }
 
     fn has_errors(&self) -> bool {
-        self.collector
-            .snapshot()
-            .counters
-            .values()
-            .any(|&v| v > 0)
+        self.collector.snapshot().counters.values().any(|&v| v > 0)
     }
 }
 
@@ -76,7 +74,9 @@ impl HealthCheck for MetricsHealthCheck {
         "metrics"
     }
 
-    fn check(&self) -> std::pin::Pin<Box<dyn std::future::Future<Output = HealthStatus> + Send + '_>> {
+    fn check(
+        &self,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = HealthStatus> + Send + '_>> {
         let has_errors = self.has_errors();
         Box::pin(async move {
             if has_errors {
@@ -177,7 +177,7 @@ mod tests {
         bridge.emit_now();
     }
 
-#[cfg(feature = "lifecycle")]
+    #[cfg(feature = "lifecycle")]
     #[tokio::test]
     async fn lifecycle_manager_with_metrics_bridge() {
         let collector = MetricsCollector::new();

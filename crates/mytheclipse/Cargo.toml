@@ -44,8 +44,18 @@ path = "examples/main.rs"
 required-features = ["full"]
 
 [[example]]
+name = "high_level"
+path = "examples/high_level.rs"
+required-features = ["full"]
+
+[[example]]
 name = "scaling_demo"
 path = "examples/scaling_demo.rs"
+required-features = ["full"]
+
+[[test]]
+name = "race_stress"
+path = "tests/race_stress.rs"
 required-features = ["full"]
 
 [[bench]]

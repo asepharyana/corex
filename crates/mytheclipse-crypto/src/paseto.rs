@@ -5,6 +5,8 @@
 
 use std::time::{Duration, SystemTime};
 
+use base64::engine::general_purpose::STANDARD;
+use base64::Engine;
 use serde::{Deserialize, Serialize};
 
 /// Errors returned by PASETO operations.
@@ -58,26 +60,26 @@ impl PasetoClaims {
 ///
 /// This is a stub implementation. For production use with `pasetors` 0.6,
 /// the token format follows the PASETO v4.local specification.
-pub struct PasetoSigner {
-    key: Vec<u8>,
-}
+pub struct PasetoSigner {}
 
 impl PasetoSigner {
     /// Creates a new signer with the given 32-byte key.
     pub fn new(key: &[u8]) -> Result<Self, PasetoError> {
         if key.len() != 32 {
-            return Err(PasetoError::Sign("key must be 32 bytes for v4-local".to_string()));
+            return Err(PasetoError::Sign(
+                "key must be 32 bytes for v4-local".to_string(),
+            ));
         }
-        Ok(Self { key: key.to_vec() })
+        Ok(Self {})
     }
 
     /// Signs claims into a PASETO v4.local token string.
     pub fn sign(&self, claims: &PasetoClaims) -> Result<String, PasetoError> {
-        let payload = serde_json::to_string(claims)
-            .map_err(|e| PasetoError::Sign(e.to_string()))?;
+        let payload =
+            serde_json::to_string(claims).map_err(|e| PasetoError::Sign(e.to_string()))?;
         let nonce = rand::random::<[u8; 24]>();
-        let nonce_b64 = base64::encode(&nonce);
-        let payload_b64 = base64::encode(payload);
+        let nonce_b64 = STANDARD.encode(nonce);
+        let payload_b64 = STANDARD.encode(payload.as_bytes());
         Ok(format!("v4.local.{nonce_b64}.{payload_b64}"))
     }
 
@@ -88,10 +90,11 @@ impl PasetoSigner {
             return Err(PasetoError::InvalidToken);
         }
 
-        let payload_bytes = base64::decode(parts[3])
+        let payload_bytes = STANDARD
+            .decode(parts[3])
             .map_err(|_| PasetoError::InvalidToken)?;
-        let claims: PasetoClaims = serde_json::from_slice(&payload_bytes)
-            .map_err(|_| PasetoError::InvalidToken)?;
+        let claims: PasetoClaims =
+            serde_json::from_slice(&payload_bytes).map_err(|_| PasetoError::InvalidToken)?;
 
         let now = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)

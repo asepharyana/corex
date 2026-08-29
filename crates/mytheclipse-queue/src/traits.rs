@@ -3,8 +3,8 @@
 use async_trait::async_trait;
 use std::time::Duration;
 
+use crate::error::{JobError, QueueError};
 use crate::job::Job;
-use crate::error::{QueueError, JobError};
 
 /// A handle to a single unit of queued work.
 ///

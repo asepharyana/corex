@@ -113,7 +113,7 @@ pub async fn enqueue_with_backpressure<Q: Queue + ?Sized>(
 ) -> Result<usize, BackpressureError> {
     let mut rejected = 0;
     for payload in payloads {
-        if let Err(_) = enforcer.try_enqueue(queue, topic, payload).await {
+        if enforcer.try_enqueue(queue, topic, payload).await.is_err() {
             rejected += 1;
         }
     }
@@ -142,6 +142,9 @@ mod tests {
         let _first = reg.global.clone().acquire_owned().await.unwrap();
 
         let result = reg.try_enqueue(&queue, "t", b"x".to_vec()).await;
-        assert!(matches!(result, Err(BackpressureError::LimitReached { .. })));
+        assert!(matches!(
+            result,
+            Err(BackpressureError::LimitReached { .. })
+        ));
     }
 }

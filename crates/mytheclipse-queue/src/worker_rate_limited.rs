@@ -6,8 +6,8 @@
 //! service faster than its rate limit allows.
 
 use crate::rate_limited::RateLimitedQueue;
-use crate::worker::{JobHandler, WorkerConfig, WorkerPool};
 use crate::traits::Queue;
+use crate::worker::{JobHandler, WorkerConfig, WorkerPool};
 
 /// A `WorkerPool` whose dequeue is rate-limited via a token bucket.
 pub struct RateLimitedWorkerPool<Q: Queue + 'static> {
@@ -40,12 +40,8 @@ mod tests {
     #[test]
     fn constructs_rate_limited_pool() {
         use crate::in_memory::InMemoryQueue;
-        let _pool = RateLimitedWorkerPool::new(
-            InMemoryQueue::new(),
-            WorkerConfig::default(),
-            10.0,
-            5,
-        );
+        let _pool =
+            RateLimitedWorkerPool::new(InMemoryQueue::new(), WorkerConfig::default(), 10.0, 5);
         // smoke: just verifies construction
     }
 }

@@ -69,7 +69,12 @@ impl Drop for LockGuard {
 #[async_trait]
 pub trait DistributedLock: Send + Sync {
     /// Attempts to acquire the lock with the given lease duration.
-    async fn acquire(&self, key: &str, lease: Duration, timeout: Duration) -> Result<LockGuard, LockError>;
+    async fn acquire(
+        &self,
+        key: &str,
+        lease: Duration,
+        timeout: Duration,
+    ) -> Result<LockGuard, LockError>;
 
     /// Releases the lock.
     async fn release(&self, key: &str) -> Result<(), LockError>;
@@ -90,14 +95,6 @@ impl InProcLock {
             held: Arc::new(Mutex::new(std::collections::HashMap::new())),
         }
     }
-
-    fn is_expired(map: &std::collections::HashMap<String, Instant>, key: &str) -> bool {
-        if let Some(expiry) = map.get(key) {
-            *expiry <= Instant::now()
-        } else {
-            false
-        }
-    }
 }
 
 impl Default for InProcLock {
@@ -108,7 +105,12 @@ impl Default for InProcLock {
 
 #[async_trait]
 impl DistributedLock for InProcLock {
-    async fn acquire(&self, key: &str, lease: Duration, timeout: Duration) -> Result<LockGuard, LockError> {
+    async fn acquire(
+        &self,
+        key: &str,
+        lease: Duration,
+        timeout: Duration,
+    ) -> Result<LockGuard, LockError> {
         let deadline = Instant::now() + timeout;
         loop {
             {
@@ -154,7 +156,10 @@ mod tests {
     #[tokio::test]
     async fn lock_acquire_release() {
         let lock = InProcLock::new();
-        let guard = lock.acquire("key", Duration::from_secs(10), Duration::from_secs(1)).await.unwrap();
+        let guard = lock
+            .acquire("key", Duration::from_secs(10), Duration::from_secs(1))
+            .await
+            .unwrap();
         assert!(lock.release("key").await.is_ok());
         drop(guard);
     }
@@ -162,9 +167,14 @@ mod tests {
     #[tokio::test]
     async fn lock_rejects_second_acquire() {
         let lock = InProcLock::new();
-        let _guard1 = lock.acquire("key", Duration::from_secs(10), Duration::from_secs(1)).await.unwrap();
+        let _guard1 = lock
+            .acquire("key", Duration::from_secs(10), Duration::from_secs(1))
+            .await
+            .unwrap();
         // While guard1 is alive, a second acquire with short timeout should fail.
-        let result = lock.acquire("key", Duration::from_secs(10), Duration::from_millis(50)).await;
+        let result = lock
+            .acquire("key", Duration::from_secs(10), Duration::from_millis(50))
+            .await;
         assert!(result.is_err());
         drop(_guard1);
     }
@@ -172,21 +182,31 @@ mod tests {
     #[tokio::test]
     async fn lock_auto_releases_on_drop() {
         let lock = InProcLock::new();
-        let guard = lock.acquire("k", Duration::from_secs(10), Duration::from_secs(1)).await.unwrap();
+        let guard = lock
+            .acquire("k", Duration::from_secs(10), Duration::from_secs(1))
+            .await
+            .unwrap();
         drop(guard);
         // After drop, the lock should be releasable / re-acquirable.
-        let result = lock.acquire("k", Duration::from_secs(10), Duration::from_millis(50)).await;
+        let result = lock
+            .acquire("k", Duration::from_secs(10), Duration::from_millis(50))
+            .await;
         assert!(result.is_ok(), "lock should be free after guard drop");
     }
 
     #[tokio::test]
     async fn lock_expires_after_lease() {
         let lock = InProcLock::new();
-        let _guard = lock.acquire("key", Duration::from_millis(20), Duration::from_millis(5)).await.unwrap();
+        let _guard = lock
+            .acquire("key", Duration::from_millis(20), Duration::from_millis(5))
+            .await
+            .unwrap();
         drop(_guard);
         tokio::time::sleep(Duration::from_millis(30)).await;
         // Should be acquirable now.
-        let result = lock.acquire("key", Duration::from_millis(20), Duration::from_millis(5)).await;
+        let result = lock
+            .acquire("key", Duration::from_millis(20), Duration::from_millis(5))
+            .await;
         assert!(result.is_ok());
     }
 }

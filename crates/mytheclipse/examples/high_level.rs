@@ -21,8 +21,8 @@ use mytheclipse::{
     pool::{AutoReconnectPool, Pool, Reconnectable, SemaphorePool},
     retry_ext::RetryExt,
     runtime_auto::RuntimeConfig,
-    shutdown_guard::ShutdownGuard,
     service_builder::ServiceConfig,
+    shutdown_guard::ShutdownGuard,
 };
 
 #[tokio::main]
@@ -66,7 +66,10 @@ async fn main() {
         }
     };
     let value = fut.retry(cfg, |_: &String| true, op).await.unwrap();
-    println!("3. RetryExt with {} attempts -> {value}", attempts.load(Ordering::SeqCst));
+    println!(
+        "3. RetryExt with {} attempts -> {value}",
+        attempts.load(Ordering::SeqCst)
+    );
 
     // 4. RAII ShutdownGuard — callback runs exactly once on drop, panic-safe.
     let fired = Arc::new(AtomicU32::new(0));
@@ -93,18 +96,20 @@ async fn main() {
     let svc = AutoMetricsServiceBuilder::new("demo_op", svc_cfg);
     let n = Arc::new(AtomicU32::new(0));
     let n2 = Arc::clone(&n);
-    let _: Result<u32, mytheclipse::service_builder::RunError<()>> = svc.run(|| {
-        let n2 = Arc::clone(&n2);
-        Box::pin(async move {
-            tokio::time::sleep(Duration::from_millis(5)).await;
-            let v = n2.fetch_add(1, Ordering::SeqCst);
-            if v < 1 {
-                Err(())
-            } else {
-                Ok(7u32)
-            }
+    let _: Result<u32, mytheclipse::service_builder::RunError<()>> = svc
+        .run(|| {
+            let n2 = Arc::clone(&n2);
+            Box::pin(async move {
+                tokio::time::sleep(Duration::from_millis(5)).await;
+                let v = n2.fetch_add(1, Ordering::SeqCst);
+                if v < 1 {
+                    Err(())
+                } else {
+                    Ok(7u32)
+                }
+            })
         })
-    }).await;
+        .await;
     let snap = svc.collector().snapshot();
     println!(
         "6. AutoMetrics -> {} counters, {} histograms",

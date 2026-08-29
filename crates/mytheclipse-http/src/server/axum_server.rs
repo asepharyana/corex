@@ -1,9 +1,6 @@
 //! Axum-based HTTP server with health endpoint.
 
-use axum::{
-    routing::get,
-    Router,
-};
+use axum::{routing::get, Router};
 use std::net::SocketAddr;
 
 /// A pre-configured HTTP server with health check and metrics endpoints.
@@ -19,10 +16,7 @@ impl HttpServer {
             .route("/health", get(|| async { "OK" }))
             .route("/", get(|| async { "mytheclipse-http" }));
 
-        Self {
-            app: router,
-            addr,
-        }
+        Self { app: router, addr }
     }
 
     /// Adds a custom route with a GET handler.

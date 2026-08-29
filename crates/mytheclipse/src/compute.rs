@@ -121,18 +121,16 @@ where
     F: Fn(I::Item) -> Result<T, String> + Send + Sync,
 {
     let wrapped = AssertUnwindSafe(f);
-    let collected: Vec<Result<T, String>> = context()
-        .compute_pool
-        .install(move || {
-            let f = wrapped;
-            items
-                .into_par_iter()
-                .map(|item| {
-                    catch_unwind(AssertUnwindSafe(|| f(item)))
-                        .unwrap_or_else(|payload| Err(panic_payload_to_string(payload)))
-                })
-                .collect()
-        });
+    let collected: Vec<Result<T, String>> = context().compute_pool.install(move || {
+        let f = wrapped;
+        items
+            .into_par_iter()
+            .map(|item| {
+                catch_unwind(AssertUnwindSafe(|| f(item)))
+                    .unwrap_or_else(|payload| Err(panic_payload_to_string(payload)))
+            })
+            .collect()
+    });
 
     let mut values = Vec::with_capacity(collected.len());
     let mut errors = Vec::new();
@@ -165,10 +163,7 @@ where
 /// ).unwrap();
 /// assert_eq!(a + b, (0..2_000_000u64).sum::<u64>());
 /// ```
-pub fn compute_join<A, RA, B, RB>(
-    a: A,
-    b: B,
-) -> Result<(RA, RB), MytheclipseError>
+pub fn compute_join<A, RA, B, RB>(a: A, b: B) -> Result<(RA, RB), MytheclipseError>
 where
     A: FnOnce() -> RA + Send,
     RA: Send,
@@ -177,15 +172,19 @@ where
 {
     let a = AssertUnwindSafe(a);
     let b = AssertUnwindSafe(b);
-    context()
-        .compute_pool
-        .install(|| {
-            let (ra, rb) = rayon::join(
-                move || catch_unwind(a).map_err(|p| MytheclipseError::ComputePanic(panic_payload_to_string(p))),
-                move || catch_unwind(b).map_err(|p| MytheclipseError::ComputePanic(panic_payload_to_string(p))),
-            );
-            Ok((ra?, rb?))
-        })
+    context().compute_pool.install(|| {
+        let (ra, rb) = rayon::join(
+            move || {
+                catch_unwind(a)
+                    .map_err(|p| MytheclipseError::ComputePanic(panic_payload_to_string(p)))
+            },
+            move || {
+                catch_unwind(b)
+                    .map_err(|p| MytheclipseError::ComputePanic(panic_payload_to_string(p)))
+            },
+        );
+        Ok((ra?, rb?))
+    })
 }
 
 /// Runs `f` over every item on the compute pool in parallel, discarding
@@ -211,25 +210,20 @@ where
     F: Fn(I::Item) -> Result<(), String> + Send + Sync,
 {
     let wrapped = AssertUnwindSafe(f);
-    let collected: Vec<Result<(), String>> = context()
-        .compute_pool
-        .install(move || {
-            let f = wrapped;
-            items
-                .into_par_iter()
-                .map(|item| {
-                    catch_unwind(AssertUnwindSafe(|| f(item)))
-                        .unwrap_or_else(|payload| Err(panic_payload_to_string(payload)))
-                })
-                .collect()
-        });
+    let collected: Vec<Result<(), String>> = context().compute_pool.install(move || {
+        let f = wrapped;
+        items
+            .into_par_iter()
+            .map(|item| {
+                catch_unwind(AssertUnwindSafe(|| f(item)))
+                    .unwrap_or_else(|payload| Err(panic_payload_to_string(payload)))
+            })
+            .collect()
+    });
 
     if collected.iter().any(|r| r.is_err()) {
         Err(ComputeErrors {
-            errors: collected
-                .into_iter()
-                .filter_map(|r| r.err())
-                .collect(),
+            errors: collected.into_iter().filter_map(|r| r.err()).collect(),
         })
     } else {
         Ok(())

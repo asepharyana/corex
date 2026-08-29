@@ -18,7 +18,10 @@ struct TopicQueue {
 impl std::fmt::Debug for TopicQueue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("TopicQueue")
-            .field("jobs_len", &self.jobs.try_lock().map(|j| j.len()).unwrap_or(0))
+            .field(
+                "jobs_len",
+                &self.jobs.try_lock().map(|j| j.len()).unwrap_or(0),
+            )
             .finish()
     }
 }
@@ -80,7 +83,10 @@ impl InMemoryQueue {
 impl Queue for InMemoryQueue {
     async fn enqueue(&self, topic: &str, payload: Vec<u8>) -> Result<(), QueueError> {
         let tq = self.get_topic(topic).await;
-        tq.jobs.lock().await.push(Job::new(JobId::generate(), topic, payload));
+        tq.jobs
+            .lock()
+            .await
+            .push(Job::new(JobId::generate(), topic, payload));
         tq.notify.notify_one();
         Ok(())
     }
@@ -140,7 +146,11 @@ mod tests {
     async fn enqueue_dequeue_roundtrip() {
         let q = InMemoryQueue::new();
         q.enqueue("test", b"hello".to_vec()).await.unwrap();
-        let job = q.dequeue("test", Duration::from_millis(500)).await.unwrap().unwrap();
+        let job = q
+            .dequeue("test", Duration::from_millis(500))
+            .await
+            .unwrap()
+            .unwrap();
         assert_eq!(job.payload, b"hello");
         assert_eq!(job.topic, "test");
     }

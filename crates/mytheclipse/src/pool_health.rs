@@ -8,7 +8,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use crate::health::{HealthCheck, HealthRegistry, HealthStatus};
-use crate::pool::{Pool, Pooled, PoolError, SemaphorePool};
+use crate::pool::{Pool, PoolError, Pooled, SemaphorePool};
 
 /// A health check backed by a closure.
 struct ClosureCheck {
@@ -21,7 +21,9 @@ impl HealthCheck for ClosureCheck {
         &self.name
     }
 
-    fn check(&self) -> std::pin::Pin<Box<dyn std::future::Future<Output = HealthStatus> + Send + '_>> {
+    fn check(
+        &self,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = HealthStatus> + Send + '_>> {
         let status = (self.check)();
         Box::pin(async move { status })
     }

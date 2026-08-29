@@ -18,8 +18,8 @@ use mytheclipse::aggregate_error::AggregateError;
 use mytheclipse::parallel_map::{parallel_for_each, parallel_map};
 use mytheclipse::pool::{Pool, SemaphorePool};
 use mytheclipse::ratelimit::RateLimiter;
-use mytheclipse::retry_ext::RetryExt;
 use mytheclipse::retry::RetryConfig;
+use mytheclipse::retry_ext::RetryExt;
 use mytheclipse::shutdown_guard::ShutdownGuard;
 
 fn rt() -> Runtime {
@@ -52,9 +52,13 @@ fn bench_parallel_for_each(c: &mut Criterion) {
     let rt = rt();
     c.bench_function("parallel_for_each/1000x8", |b| {
         b.to_async(&rt).iter(|| async {
-            parallel_for_each(0u32..1000, 8, |_| async move { Ok::<_, std::io::Error>(()) })
-                .await
-                .unwrap();
+            parallel_for_each(
+                0u32..1000,
+                8,
+                |_| async move { Ok::<_, std::io::Error>(()) },
+            )
+            .await
+            .unwrap();
             black_box(());
         });
     });

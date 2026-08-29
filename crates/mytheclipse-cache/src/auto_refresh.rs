@@ -71,7 +71,12 @@ where
     }
 
     /// Sets a value in the underlying cache.
-    pub async fn set(&self, key: &str, value: Vec<u8>, ttl: Option<Duration>) -> Result<(), CacheError> {
+    pub async fn set(
+        &self,
+        key: &str,
+        value: Vec<u8>,
+        ttl: Option<Duration>,
+    ) -> Result<(), CacheError> {
         self.inner.set(key, value, ttl).await
     }
 

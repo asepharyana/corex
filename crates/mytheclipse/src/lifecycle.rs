@@ -15,9 +15,7 @@ use crate::shutdown::ShutdownManager;
 ///
 /// Typical usage:
 /// ```ignore
-/// # tokio::runtime::Runtime::new().unwrap().block_on(async {
-/// # use mytheclipse::AsyncLifecycleManager;
-/// let mgr = AsyncLifecycleManager::new();
+/// let mgr = mytheclipse::AsyncLifecycleManager::new();
 /// mgr.register_health_check("db", my_db_check());
 /// let handle = mgr.start_health_loop(std::time::Duration::from_secs(30));
 /// mgr.await_shutdown(std::time::Duration::from_secs(10)).await;
@@ -47,7 +45,11 @@ impl AsyncLifecycleManager {
     }
 
     /// Registers a named health check.
-    pub async fn register_health_check(&self, name: impl Into<String>, check: impl HealthCheck + 'static) {
+    pub async fn register_health_check(
+        &self,
+        name: impl Into<String>,
+        check: impl HealthCheck + 'static,
+    ) {
         self.health.register(name, check).await;
     }
 
@@ -73,7 +75,7 @@ impl AsyncLifecycleManager {
             loop {
                 // Stop when shutdown is requested.
                 if sig.is_shutdown() {
-                    tracing::info_span!("mytheclipse_health_loop", );
+                    tracing::info_span!("mytheclipse_health_loop",);
                     return;
                 }
                 tokio::select! {
@@ -124,16 +126,26 @@ mod tests {
 
     struct AlwaysOk;
     impl HealthCheck for AlwaysOk {
-        fn name(&self) -> &str { "always-ok" }
-        fn check(&self) -> std::pin::Pin<Box<dyn std::future::Future<Output = HealthStatus> + Send + '_>> {
+        fn name(&self) -> &str {
+            "always-ok"
+        }
+        fn check(
+            &self,
+        ) -> std::pin::Pin<Box<dyn std::future::Future<Output = HealthStatus> + Send + '_>>
+        {
             Box::pin(async { HealthStatus::Ok })
         }
     }
 
     struct AlwaysBad;
     impl HealthCheck for AlwaysBad {
-        fn name(&self) -> &str { "always-bad" }
-        fn check(&self) -> std::pin::Pin<Box<dyn std::future::Future<Output = HealthStatus> + Send + '_>> {
+        fn name(&self) -> &str {
+            "always-bad"
+        }
+        fn check(
+            &self,
+        ) -> std::pin::Pin<Box<dyn std::future::Future<Output = HealthStatus> + Send + '_>>
+        {
             Box::pin(async { HealthStatus::Unhealthy })
         }
     }

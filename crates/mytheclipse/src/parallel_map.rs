@@ -234,8 +234,7 @@ where
     // Producer: feed items into the bounded channel (backpressures when all
     // workers are busy — no full materialization).
     tokio::spawn(async move {
-        let mut it = items.into_iter();
-        while let Some(item) = it.next() {
+        for item in items {
             if tx.send(item).await.is_err() {
                 break; // all workers dropped
             }
@@ -286,11 +285,9 @@ mod tests {
 
     #[tokio::test]
     async fn maps_in_order_with_bounded_concurrency() {
-        let out = parallel_map(
-            vec![1, 2, 3, 4],
-            2,
-            |x: i32| async move { Ok::<_, std::io::Error>(x * 2) },
-        )
+        let out = parallel_map(vec![1, 2, 3, 4], 2, |x: i32| async move {
+            Ok::<_, std::io::Error>(x * 2)
+        })
         .await
         .unwrap();
         assert_eq!(out, vec![2, 4, 6, 8]);
@@ -298,17 +295,13 @@ mod tests {
 
     #[tokio::test]
     async fn aggregates_errors_from_failing_tasks() {
-        let out = parallel_map(
-            vec![1, 2, 3],
-            4,
-            |x: i32| async move {
-                if x == 2 {
-                    Err(std::io::Error::new(std::io::ErrorKind::Other, "boom"))
-                } else {
-                    Ok::<_, std::io::Error>(x)
-                }
-            },
-        )
+        let out = parallel_map(vec![1, 2, 3], 4, |x: i32| async move {
+            if x == 2 {
+                Err(std::io::Error::new(std::io::ErrorKind::Other, "boom"))
+            } else {
+                Ok::<_, std::io::Error>(x)
+            }
+        })
         .await;
         assert!(out.is_err());
         assert_eq!(out.unwrap_err().len(), 1);
@@ -316,12 +309,11 @@ mod tests {
 
     #[tokio::test]
     async fn empty_input_returns_empty() {
-        let out: Result<Vec<i32>, AggregateError> = parallel_map(
-            Vec::<i32>::new(),
-            4,
-            |x: i32| async move { Ok::<_, std::io::Error>(x) },
-        )
-        .await;
+        let out: Result<Vec<i32>, AggregateError> =
+            parallel_map(Vec::<i32>::new(), 4, |x: i32| async move {
+                Ok::<_, std::io::Error>(x)
+            })
+            .await;
         assert_eq!(out.unwrap(), vec![]);
     }
 
@@ -330,17 +322,13 @@ mod tests {
         use std::sync::atomic::{AtomicUsize, Ordering};
         let count = Arc::new(AtomicUsize::new(0));
         let c = Arc::clone(&count);
-        let out = parallel_for_each(
-            vec![1_i32, 2, 3, 4, 5],
-            2,
-            move |_: i32| {
-                let c = Arc::clone(&c);
-                async move {
-                    c.fetch_add(1, Ordering::SeqCst);
-                    Ok::<_, std::io::Error>(())
-                }
-            },
-        )
+        let out = parallel_for_each(vec![1_i32, 2, 3, 4, 5], 2, move |_: i32| {
+            let c = Arc::clone(&c);
+            async move {
+                c.fetch_add(1, Ordering::SeqCst);
+                Ok::<_, std::io::Error>(())
+            }
+        })
         .await;
         assert!(out.is_ok());
         assert_eq!(count.load(Ordering::SeqCst), 5);

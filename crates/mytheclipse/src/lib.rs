@@ -12,7 +12,7 @@
 //! - [`spawn_io`] (feature `io`) — spawn an async I/O task, tracing-instrumented.
 //! - [`compute()`] (feature `compute`) — run CPU-bound work on a sized Rayon pool, panic-isolated.
 //! - [`spawn_bg`] (feature `bg`) — spawn a background task under bounded concurrency.
-//! - [`retry`] / [`CircuitBreaker`] / [`timeout()`] (feature `resiliency`) — fault tolerance.
+//! - [`retry()`] / [`CircuitBreaker`] / [`timeout()`] (feature `resiliency`) — fault tolerance.
 //! - [`RateLimiter`] / [`BackpressureQueue`] / [`ConcurrencyLimiter`] (feature `traffic`) — load control.
 //! - [`SemaphorePool`] (feature `traffic`) — shared bounded resource pool.
 //! - [`ShutdownManager`] / [`CronSchedule`] (feature `lifecycle`) — lifecycle + scheduling.
@@ -24,30 +24,32 @@
 pub mod context;
 pub mod error;
 
-#[cfg(feature = "io")]
-pub mod io;
-#[cfg(feature = "compute")]
-pub mod compute;
 #[cfg(feature = "bg")]
 pub mod bg;
+#[cfg(feature = "compute")]
+pub mod compute;
+#[cfg(feature = "io")]
+pub mod io;
 
-#[cfg(feature = "resiliency")]
-pub mod retry;
-#[cfg(feature = "resiliency")]
-pub mod retry_ext;
 #[cfg(feature = "resiliency")]
 pub mod aggregate_error;
 #[cfg(feature = "resiliency")]
 pub mod parallel_map;
 #[cfg(feature = "resiliency")]
-pub use retry_ext::RetryExt;
+pub mod retry;
+#[cfg(feature = "resiliency")]
+pub mod retry_ext;
 #[cfg(feature = "resiliency")]
 pub use aggregate_error::AggregateError;
 #[cfg(feature = "resiliency")]
-pub use parallel_map::{parallel_map, parallel_map_unordered, parallel_for_each, ParallelConcurrency};
-#[cfg(feature = "observability")]
+pub use parallel_map::{
+    parallel_for_each, parallel_map, parallel_map_unordered, ParallelConcurrency,
+};
+#[cfg(feature = "resiliency")]
+pub use retry_ext::RetryExt;
+#[cfg(all(feature = "observability", feature = "resiliency"))]
 pub mod auto_metrics_service;
-#[cfg(feature = "observability")]
+#[cfg(all(feature = "observability", feature = "resiliency"))]
 pub use auto_metrics_service::AutoMetricsServiceBuilder;
 #[cfg(feature = "resiliency")]
 pub mod circuit_breaker;
@@ -55,26 +57,26 @@ pub mod circuit_breaker;
 pub mod timeout;
 
 #[cfg(feature = "traffic")]
-pub mod ratelimit;
-#[cfg(feature = "traffic")]
 pub mod backpressure;
 #[cfg(feature = "traffic")]
 pub mod concurrency;
 #[cfg(feature = "traffic")]
 pub mod pool;
+#[cfg(feature = "traffic")]
+pub mod ratelimit;
 
-#[cfg(feature = "lifecycle")]
-pub mod shutdown;
 #[cfg(feature = "lifecycle")]
 pub mod cron;
 #[cfg(feature = "lifecycle")]
 pub mod health;
-#[cfg(all(feature = "observability", feature = "traffic"))]
-pub mod pool_health;
 #[cfg(feature = "lifecycle")]
 pub mod leader;
 #[cfg(feature = "lifecycle")]
 pub mod lifecycle;
+#[cfg(all(feature = "observability", feature = "traffic"))]
+pub mod pool_health;
+#[cfg(feature = "lifecycle")]
+pub mod shutdown;
 
 #[cfg(feature = "lifecycle")]
 pub mod bg_join;
@@ -94,59 +96,59 @@ pub mod middleware;
 #[cfg(feature = "observability")]
 pub mod metrics;
 #[cfg(feature = "observability")]
-pub mod panic_tracker;
-#[cfg(feature = "observability")]
 pub mod metrics_bridge;
+#[cfg(feature = "observability")]
+pub mod panic_tracker;
 
-#[cfg(feature = "resiliency")]
-pub mod service_builder;
 #[cfg(feature = "lifecycle")]
 pub mod dlock;
+#[cfg(feature = "resiliency")]
+pub mod service_builder;
 
 pub use context::{context, EngineContext};
 pub use error::MytheclipseError;
 
-#[cfg(feature = "io")]
-pub use io::spawn_io;
-#[cfg(feature = "compute")]
-pub use compute::{compute, compute_join, compute_map, compute_par_for_each, ComputeErrors};
 #[cfg(feature = "bg")]
 pub use bg::spawn_bg;
+#[cfg(feature = "compute")]
+pub use compute::{compute, compute_join, compute_map, compute_par_for_each, ComputeErrors};
+#[cfg(feature = "io")]
+pub use io::spawn_io;
 
-#[cfg(feature = "resiliency")]
-pub use retry::{retry, JitterKind, RetryConfig, RetryError};
 #[cfg(feature = "resiliency")]
 pub use circuit_breaker::{CircuitBreaker, CircuitBreakerConfig, CircuitError, CircuitState};
 #[cfg(feature = "resiliency")]
+pub use retry::{retry, JitterKind, RetryConfig, RetryError};
+#[cfg(feature = "resiliency")]
 pub use timeout::{timeout, with_timeout, Timeout, TimeoutError};
 
-#[cfg(feature = "traffic")]
-pub use ratelimit::{RateLimitError, RateLimiter};
+/// Re-export of `async-trait` so implementing [`pool::Reconnectable`] (and
+/// other async traits) doesn't require users to add their own `async-trait`
+/// dependency.
+pub use async_trait::async_trait;
 #[cfg(feature = "traffic")]
 pub use backpressure::{BackpressureError, BackpressureQueue, OverflowPolicy};
 #[cfg(feature = "traffic")]
 pub use concurrency::{ConcurrencyLimiter, ConcurrencyPermit};
 #[cfg(feature = "traffic")]
-pub use pool::{Pool, PoolError, Pooled, SemaphorePool, AutoReconnectPool, Reconnectable};
-/// Re-export of `async-trait` so implementing [`pool::Reconnectable`] (and
-/// other async traits) doesn't require users to add their own `async-trait`
-/// dependency.
-pub use async_trait::async_trait;
+pub use pool::{AutoReconnectPool, Pool, PoolError, Pooled, Reconnectable, SemaphorePool};
+#[cfg(feature = "traffic")]
+pub use ratelimit::{RateLimitError, RateLimiter};
 
-#[cfg(feature = "lifecycle")]
-pub use shutdown::{ShutdownManager, ShutdownSignal};
 #[cfg(feature = "lifecycle")]
 pub use cron::{schedule, CronError, CronJob, CronParseError, CronSchedule};
 #[cfg(feature = "lifecycle")]
 pub use health::{HealthCheck, HealthRegistry, HealthStatus};
 #[cfg(feature = "lifecycle")]
 pub use leader::{InProcLeaderElection, LeaderElection};
+#[cfg(feature = "lifecycle")]
+pub use shutdown::{ShutdownManager, ShutdownSignal};
 
 #[cfg(feature = "resiliency")]
 pub use service_builder::{RunError, ServiceBuilder, ServiceConfig};
 
 #[cfg(feature = "lifecycle")]
-pub use dlock::{DistributedLock, LockError, LockGuard, InProcLock};
+pub use dlock::{DistributedLock, InProcLock, LockError, LockGuard};
 #[cfg(feature = "lifecycle")]
 pub use lifecycle::AsyncLifecycleManager;
 
@@ -169,7 +171,7 @@ pub use pool_health::HealthCheckedPool;
 pub use bg_join::BgJoiner;
 
 #[cfg(all(feature = "observability", feature = "resiliency"))]
-pub use middleware::{MiddlewarePipeline, PipelineError, BoxMiddleware, mw};
+pub use middleware::{mw, BoxMiddleware, MiddlewarePipeline, PipelineError};
 #[cfg(feature = "observability")]
 pub use panic_tracker::{PanicGuard, PanicInfo, PanicTracker};
 

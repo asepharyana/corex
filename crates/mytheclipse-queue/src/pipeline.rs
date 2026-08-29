@@ -75,16 +75,14 @@ where
             let mut input = input;
             loop {
                 match input.recv().await {
-                    Some(item) => {
-                        match stage.process(item).await {
-                            Ok(out) => {
-                                if output.send(out).await.is_err() {
-                                    return Err(StageError::ChannelClosed);
-                                }
+                    Some(item) => match stage.process(item).await {
+                        Ok(out) => {
+                            if output.send(out).await.is_err() {
+                                return Err(StageError::ChannelClosed);
                             }
-                            Err(e) => return Err(e),
                         }
-                    }
+                        Err(e) => return Err(e),
+                    },
                     None => return Ok(()),
                 }
             }

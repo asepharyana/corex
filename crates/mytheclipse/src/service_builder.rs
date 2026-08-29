@@ -11,10 +11,10 @@ use tracing::Instrument;
 
 #[cfg(feature = "resiliency")]
 use crate::circuit_breaker::CircuitBreaker;
-#[cfg(feature = "resiliency")]
-use crate::retry::{retry, RetryConfig, RetryError};
 #[cfg(feature = "traffic")]
 use crate::ratelimit::RateLimiter;
+#[cfg(feature = "resiliency")]
+use crate::retry::{retry, RetryConfig, RetryError};
 
 /// Error returned by [`ServiceBuilder::run`].
 #[derive(Debug)]
@@ -55,7 +55,10 @@ pub struct ServiceConfig {
 #[cfg(not(feature = "traffic"))]
 impl Default for ServiceConfig {
     fn default() -> Self {
-        Self { max_attempts: 0, timeout: Duration::ZERO }
+        Self {
+            max_attempts: 0,
+            timeout: Duration::ZERO,
+        }
     }
 }
 
@@ -71,7 +74,12 @@ pub struct ServiceConfig {
 #[cfg(feature = "traffic")]
 impl Default for ServiceConfig {
     fn default() -> Self {
-        Self { max_attempts: 0, timeout: Duration::ZERO, rate_per_sec: 0.0, rate_burst: 0 }
+        Self {
+            max_attempts: 0,
+            timeout: Duration::ZERO,
+            rate_per_sec: 0.0,
+            rate_burst: 0,
+        }
     }
 }
 
@@ -146,7 +154,11 @@ impl ServiceBuilder {
     #[cfg(feature = "resiliency")]
     fn record(&self, ok: bool) {
         if let Some(cb) = &self.circuit {
-            if ok { cb.record_success(); } else { cb.record_failure(); }
+            if ok {
+                cb.record_success();
+            } else {
+                cb.record_failure();
+            }
         }
     }
 
@@ -162,7 +174,7 @@ impl ServiceBuilder {
         #[cfg(feature = "resiliency")]
         {
             if let Some(retry_cfg) = &self.retry_cfg {
-                let mut op = f;
+                let op = f;
                 let result: Result<T, RunError<E>> = if dur > Duration::ZERO {
                     // We can't easily combine retry + timeout with FnMut due to
                     // closure capture rules, so use a manual retry loop instead:
@@ -171,7 +183,8 @@ impl ServiceBuilder {
                     let mut op_ref = op;
                     loop {
                         attempt_no += 1;
-                        let span = tracing::info_span!("mytheclipse_service_call", attempt = attempt_no);
+                        let span =
+                            tracing::info_span!("mytheclipse_service_call", attempt = attempt_no);
                         let fut = op_ref();
                         let attempt_result = tokio::time::timeout(dur, fut.instrument(span)).await;
                         match attempt_result {
@@ -185,7 +198,11 @@ impl ServiceBuilder {
                                     return Err(RunError::Inner(e));
                                 }
                                 // retryable — backoff and retry
-                                let delay = crate::retry::backoff_delay(&cfg, attempt_no, rand::thread_rng());
+                                let delay = crate::retry::backoff_delay(
+                                    &cfg,
+                                    attempt_no,
+                                    rand::thread_rng(),
+                                );
                                 tokio::time::sleep(delay).await;
                             }
                             Err(_) => {
@@ -194,7 +211,11 @@ impl ServiceBuilder {
                                     return Err(RunError::Timeout);
                                 }
                                 // retryable timeout — backoff and retry
-                                let delay = crate::retry::backoff_delay(&cfg, attempt_no, rand::thread_rng());
+                                let delay = crate::retry::backoff_delay(
+                                    &cfg,
+                                    attempt_no,
+                                    rand::thread_rng(),
+                                );
                                 tokio::time::sleep(delay).await;
                             }
                         }
@@ -202,21 +223,24 @@ impl ServiceBuilder {
                 } else {
                     // retry() expects FnMut() -> Fut (not boxed), so adapt.
                     let mut inner_op = op;
-                    retry(retry_cfg.clone(), |_: &E| true, || {
-                        let span = tracing::info_span!("mytheclipse_service_call");
-                        let fut = inner_op();
-                        async move {
-                            fut.instrument(span).await
-                        }
-                    }).await
-                        .map_err(|e| {
-                            self.record(false);
-                            RunError::Retry(e)
-                        })
-                        .map(|v| {
-                            self.record(true);
-                            v
-                        })
+                    retry(
+                        retry_cfg.clone(),
+                        |_: &E| true,
+                        || {
+                            let span = tracing::info_span!("mytheclipse_service_call");
+                            let fut = inner_op();
+                            async move { fut.instrument(span).await }
+                        },
+                    )
+                    .await
+                    .map_err(|e| {
+                        self.record(false);
+                        RunError::Retry(e)
+                    })
+                    .map(|v| {
+                        self.record(true);
+                        v
+                    })
                 };
                 result
             } else {
@@ -224,7 +248,8 @@ impl ServiceBuilder {
                 let mut op = f;
                 let span = tracing::info_span!("mytheclipse_service_call");
                 let result = if dur > Duration::ZERO {
-                    tokio::time::timeout(dur, op().instrument(span)).await
+                    tokio::time::timeout(dur, op().instrument(span))
+                        .await
                         .map_err(|_| RunError::Timeout)?
                         .map_err(RunError::Inner)
                 } else {
@@ -267,13 +292,19 @@ mod tests {
         cfg.max_attempts = 3;
         let builder = ServiceBuilder::new(cfg);
         let attempts = Arc::new(std::sync::atomic::AtomicU32::new(0));
-        let result = builder.run(|| {
-            let a = Arc::clone(&attempts);
-            Box::pin(async move {
-                let n = a.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-                if n < 2 { Err::<u32, _>(()) } else { Ok::<u32, _>(42) }
+        let result = builder
+            .run(|| {
+                let a = Arc::clone(&attempts);
+                Box::pin(async move {
+                    let n = a.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                    if n < 2 {
+                        Err::<u32, _>(())
+                    } else {
+                        Ok::<u32, _>(42)
+                    }
+                })
             })
-        }).await;
+            .await;
         assert_eq!(result.unwrap(), 42);
     }
 
@@ -282,10 +313,14 @@ mod tests {
         let mut cfg = ServiceConfig::default();
         cfg.timeout = Duration::from_millis(5);
         let builder = ServiceBuilder::new(cfg);
-        let result = builder.run(|| Box::pin(async {
-            tokio::time::sleep(Duration::from_secs(1)).await;
-            Ok::<_, ()>(42u32)
-        })).await;
+        let result = builder
+            .run(|| {
+                Box::pin(async {
+                    tokio::time::sleep(Duration::from_secs(1)).await;
+                    Ok::<_, ()>(42u32)
+                })
+            })
+            .await;
         assert!(matches!(result, Err(RunError::Timeout)));
     }
 }

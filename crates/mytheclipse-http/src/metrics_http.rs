@@ -28,11 +28,7 @@ async fn metrics_handler(
         .status(200)
         .header("content-type", "text/plain; version=0.0.4")
         .body(axum::body::Body::from(body))
-        .unwrap_or_else(|_| {
-            axum::response::Response::new(axum::body::Body::from(
-                "internal error",
-            ))
-        })
+        .unwrap_or_else(|_| axum::response::Response::new(axum::body::Body::from("internal error")))
 }
 
 #[cfg(test)]

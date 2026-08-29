@@ -113,7 +113,9 @@ async fn aggregate_error_collects_all_errors_under_contention() {
         })
         .collect();
 
-    let err = AggregateError::from_results(results).err().expect("expected error");
+    let err = AggregateError::from_results(results)
+        .err()
+        .expect("expected error");
     assert_eq!(err.len(), 34, "expected 34 errors (0..99 every 3rd)");
 }
 

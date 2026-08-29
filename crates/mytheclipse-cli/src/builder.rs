@@ -1,6 +1,6 @@
 //! Clap-based CLI builder implementation.
 
-use clap::{Parser, Subcommand as ClapSubcommand};
+use clap::{CommandFactory, FromArgMatches, Parser, Subcommand as ClapSubcommand};
 
 /// A mytheclipse CLI application.
 #[derive(Parser, Debug)]
@@ -52,6 +52,17 @@ impl CliBuilder {
     }
 
     pub fn build(self) -> CliApp {
-        CliApp::parse()
+        // Apply the configured name/about to the derived clap Command so the
+        // builder's fields are honored in the rendered help/usage.
+        let Self { name, about } = self;
+        // clap's `Str`/`StyledStr` only accept 'static references, so leak
+        // the owned strings (build(self) consumes self once, so a single,
+        // process-lifetime leak is acceptable).
+        let name: &'static str = String::leak(name);
+        let about: &'static str = String::leak(about);
+        let cmd = <CliApp as CommandFactory>::command()
+            .name(name)
+            .about(about);
+        CliApp::from_arg_matches(&cmd.get_matches()).unwrap_or_else(|e| e.exit())
     }
 }

@@ -41,8 +41,8 @@
 //! assert_eq!(claims["sub"], "u1");
 //! ```
 
-pub mod key_ring;
 pub mod key_registry;
+pub mod key_ring;
 
 #[cfg(feature = "password")]
 pub mod password;
@@ -53,10 +53,10 @@ pub mod encryption;
 #[cfg(feature = "tokens")]
 pub mod token;
 
-#[cfg(feature = "paseto")]
-pub mod paseto;
 #[cfg(feature = "derivation")]
 pub mod hkdf;
+#[cfg(feature = "paseto")]
+pub mod paseto;
 
 #[cfg(feature = "password")]
 pub use password::PasswordHasher;
@@ -68,10 +68,10 @@ pub use encryption::{AeadError, Encryptor};
 pub use token::{Claims, TokenError, TokenSigner};
 
 #[cfg(feature = "paseto")]
-pub use paseto::{PasetoSigner, PasetoClaims};
+pub use paseto::{PasetoClaims, PasetoSigner};
 
-pub use key_ring::KeyRing;
 pub use key_registry::TypedKeyRegistry;
+pub use key_ring::KeyRing;
 
 #[cfg(feature = "derivation")]
 pub use hkdf::HkdfKeyDeriver;

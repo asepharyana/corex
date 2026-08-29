@@ -51,9 +51,8 @@ pub use loader::ConfigLoader;
 
 #[cfg(feature = "validation")]
 pub use validate::{
-    collect_failures, validate_non_empty, validate_port, validate_range,
-    validate_url, ConfigValidator, ConfigValidatorExt, ValidationError,
-    ValidationFailure,
+    collect_failures, validate_non_empty, validate_port, validate_range, validate_url,
+    ConfigValidator, ConfigValidatorExt, ValidationError, ValidationFailure,
 };
 
 #[cfg(feature = "hot-reload")]

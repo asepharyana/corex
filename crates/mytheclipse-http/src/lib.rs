@@ -12,7 +12,7 @@
 #[cfg(feature = "resilience")]
 pub mod resilient_client;
 #[cfg(feature = "resilience")]
-pub use resilient_client::{ResilientHttpClient, ResilientClientConfig};
+pub use resilient_client::{ResilientClientConfig, ResilientHttpClient};
 
 #[cfg(feature = "client")]
 pub mod client;

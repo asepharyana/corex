@@ -11,28 +11,31 @@
 //! - **PostgreSQL** (`postgres`) — `SKIP LOCKED` polling.
 
 pub mod error;
-pub mod job;
 #[cfg(feature = "in-memory")]
 pub mod in_memory;
+pub mod job;
 pub mod traits;
+#[cfg(feature = "in-memory")]
 pub mod worker;
 
 #[cfg(feature = "in-memory")]
-pub mod batch;
-#[cfg(feature = "in-memory")]
 pub mod backpressure_enqueue;
+#[cfg(feature = "in-memory")]
+pub mod batch;
 #[cfg(feature = "in-memory")]
 pub mod rate_limited;
 #[cfg(feature = "in-memory")]
 pub mod worker_rate_limited;
 #[cfg(feature = "in-memory")]
-pub use backpressure_enqueue::{BackpressureEnforcer, BackpressureError, enqueue_with_backpressure};
+pub use backpressure_enqueue::{
+    enqueue_with_backpressure, BackpressureEnforcer, BackpressureError,
+};
 #[cfg(feature = "in-memory")]
-pub use rate_limited::{RateLimitedQueue, RateLimitQueueError};
+pub use rate_limited::{RateLimitQueueError, RateLimitedQueue};
 #[cfg(feature = "in-memory")]
 pub use worker_rate_limited::RateLimitedWorkerPool;
 
 #[cfg(feature = "in-memory")]
 pub mod pipeline;
 #[cfg(feature = "in-memory")]
-pub use pipeline::{StageRunner, Stage, StageError};
+pub use pipeline::{Stage, StageError, StageRunner};

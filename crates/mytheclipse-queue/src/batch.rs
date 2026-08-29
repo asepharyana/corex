@@ -17,7 +17,10 @@ use crate::traits::Queue;
 
 /// A handler that processes a batch of jobs atomically.
 pub trait BatchJobHandler: Send + Sync {
-    fn handle_batch(&self, jobs: Vec<Job>) -> Pin<Box<dyn std::future::Future<Output = Result<(), JobError>> + Send>>;
+    fn handle_batch(
+        &self,
+        jobs: Vec<Job>,
+    ) -> Pin<Box<dyn std::future::Future<Output = Result<(), JobError>> + Send>>;
 }
 
 impl<F, Fut> BatchJobHandler for F
@@ -25,7 +28,10 @@ where
     F: Fn(Vec<Job>) -> Fut + Send + Sync,
     Fut: std::future::Future<Output = Result<(), JobError>> + Send + 'static,
 {
-    fn handle_batch(&self, jobs: Vec<Job>) -> Pin<Box<dyn std::future::Future<Output = Result<(), JobError>> + Send>> {
+    fn handle_batch(
+        &self,
+        jobs: Vec<Job>,
+    ) -> Pin<Box<dyn std::future::Future<Output = Result<(), JobError>> + Send>> {
         Box::pin((self)(jobs))
     }
 }
@@ -85,7 +91,8 @@ impl<Q: Queue + 'static> BatchProcessor<Q> {
         let handler: Arc<dyn BatchJobHandler> = Arc::new(handler);
         let topic_owned = topic.to_string();
 
-        let (tx, mut rx): (mpsc::Sender<Job>, mpsc::Receiver<Job>) = mpsc::channel(config.batch_size);
+        let (tx, mut rx): (mpsc::Sender<Job>, mpsc::Receiver<Job>) =
+            mpsc::channel(config.batch_size);
 
         // Dequeue loop → forward to channel
         {
@@ -147,7 +154,9 @@ impl<Q: Queue + 'static> BatchProcessor<Q> {
                 if !batch.is_empty() {
                     Self::flush(&h, &semaphore, batch).await;
                 }
-                deadline.as_mut().reset(tokio::time::Instant::now() + config.batch_timeout);
+                deadline
+                    .as_mut()
+                    .reset(tokio::time::Instant::now() + config.batch_timeout);
             }
         });
 
@@ -210,7 +219,10 @@ mod tests {
         });
 
         for i in 0..3 {
-            bp.queue.enqueue("t", format!("job{}", i).into_bytes()).await.unwrap();
+            bp.queue
+                .enqueue("t", format!("job{}", i).into_bytes())
+                .await
+                .unwrap();
         }
 
         tokio::time::sleep(Duration::from_millis(300)).await;

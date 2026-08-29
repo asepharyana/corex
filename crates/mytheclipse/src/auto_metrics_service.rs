@@ -74,8 +74,8 @@ impl AutoMetricsServiceBuilder {
         self
     }
 
-    /// Attaches a [`MetricsBridge`] to forward snapshots downstream (requires
-    /// the `resiliency` feature which pulls in the bridge).
+    /// Attaches a [`crate::metrics_bridge::MetricsBridge`] to forward snapshots
+    /// downstream (requires the `resiliency` feature which pulls in the bridge).
     #[cfg(feature = "resiliency")]
     pub fn with_bridge(mut self, bridge: crate::metrics_bridge::MetricsBridge) -> Self {
         self.bridge = Some(bridge);
@@ -108,8 +108,13 @@ impl AutoMetricsServiceBuilder {
             Err(_) => "other",
         };
 
-        self.metrics
-            .inc_counter(&format!("mytheclipse_service_calls_total{{service=\"{}\",outcome=\"{}\"}}", self.service_name, outcome), 1);
+        self.metrics.inc_counter(
+            &format!(
+                "mytheclipse_service_calls_total{{service=\"{}\",outcome=\"{}\"}}",
+                self.service_name, outcome
+            ),
+            1,
+        );
         self.metrics
             .observe("mytheclipse_service_duration_seconds", dur);
 
@@ -125,8 +130,8 @@ impl AutoMetricsServiceBuilder {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::atomic::{AtomicU32, Ordering};
     use std::sync::Arc;
-    use std::sync::atomic::{Ordering, AtomicU32};
 
     #[tokio::test]
     async fn auto_metrics_records_call() {
@@ -136,13 +141,19 @@ mod tests {
 
         let attempts = Arc::new(AtomicU32::new(0));
         let a = Arc::clone(&attempts);
-        let result: Result<u32, RunError<()>> = builder.run(|| {
-            let a = Arc::clone(&a);
-            Box::pin(async move {
-                let n = a.fetch_add(1, Ordering::SeqCst);
-                if n < 2 { Err(()) } else { Ok(42u32) }
+        let result: Result<u32, RunError<()>> = builder
+            .run(|| {
+                let a = Arc::clone(&a);
+                Box::pin(async move {
+                    let n = a.fetch_add(1, Ordering::SeqCst);
+                    if n < 2 {
+                        Err(())
+                    } else {
+                        Ok(42u32)
+                    }
+                })
             })
-        }).await;
+            .await;
         assert_eq!(result.unwrap(), 42);
         assert_eq!(attempts.load(Ordering::SeqCst), 3);
         let snap = builder.collector().snapshot();

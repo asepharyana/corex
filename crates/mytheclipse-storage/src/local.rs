@@ -67,12 +67,10 @@ impl StorageDriver for LocalFileStorage {
         let mut file = tokio::fs::File::create(&tmp)
             .await
             .map_err(|e| StorageError::Io(e.to_string()))?;
-        let written = tokio::io::copy(&mut data, &mut file)
-            .await
-            .map_err(|e| {
-                let _ = std::fs::remove_file(&tmp);
-                StorageError::Io(e.to_string())
-            })?;
+        let written = tokio::io::copy(&mut data, &mut file).await.map_err(|e| {
+            let _ = std::fs::remove_file(&tmp);
+            StorageError::Io(e.to_string())
+        })?;
         // Ensure durability: flush to OS, fsync, then rename.
         tokio::fs::File::open(&tmp)
             .await

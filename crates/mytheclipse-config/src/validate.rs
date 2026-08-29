@@ -33,7 +33,11 @@ pub struct ValidationError {
 
 impl fmt::Display for ValidationError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "config validation failed ({} issue(s)):", self.failures.len())?;
+        write!(
+            f,
+            "config validation failed ({} issue(s)):",
+            self.failures.len()
+        )?;
         for failure in &self.failures {
             write!(f, "\n  - {failure}")?;
         }
@@ -91,7 +95,11 @@ pub fn validate_url(path: &str, value: &str) -> Option<ValidationFailure> {
     }
     // Minimal heuristic: scheme + host. We avoid pulling in a full URL crate
     // to keep the dependency surface small.
-    let scheme_len = if value.starts_with("http://") { 7 } else if value.starts_with("https://") { 8 } else {
+    let scheme_len = if value.starts_with("http://") {
+        7
+    } else if value.starts_with("https://") {
+        8
+    } else {
         return Some(ValidationFailure {
             path: path.to_string(),
             message: format!("url must start with http:// or https:// (got {value:?})"),
@@ -148,7 +156,9 @@ where
 }
 
 /// Collects all failures from an iterator of `Option<ValidationFailure>`.
-pub fn collect_failures(opts: impl IntoIterator<Item = Option<ValidationFailure>>) -> Result<(), ValidationError> {
+pub fn collect_failures(
+    opts: impl IntoIterator<Item = Option<ValidationFailure>>,
+) -> Result<(), ValidationError> {
     let failures: Vec<_> = opts.into_iter().flatten().collect();
     if failures.is_empty() {
         Ok(())
@@ -186,7 +196,11 @@ mod tests {
 
     #[test]
     fn collect_failures_aggregates_all() {
-        let opts = [validate_non_empty("a", ""), validate_non_empty("b", "ok"), validate_url("c.d", "bad://x")];
+        let opts = [
+            validate_non_empty("a", ""),
+            validate_non_empty("b", "ok"),
+            validate_url("c.d", "bad://x"),
+        ];
         let err = collect_failures(opts).unwrap_err();
         assert_eq!(err.failures.len(), 2);
         assert_eq!(err.failures[0].path, "a");
@@ -195,7 +209,10 @@ mod tests {
 
     #[test]
     fn collect_failures_ok_when_all_pass() {
-        let opts = [validate_url("a", "https://ok.com"), validate_port("b", 8080)];
+        let opts = [
+            validate_url("a", "https://ok.com"),
+            validate_port("b", 8080),
+        ];
         assert!(collect_failures(opts).is_ok());
     }
 
@@ -205,7 +222,10 @@ mod tests {
         impl ConfigValidator for Cfg {
             fn validate(&self) -> Result<(), ValidationError> {
                 Err(ValidationError {
-                    failures: vec![ValidationFailure { path: "x".into(), message: "bad".into() }],
+                    failures: vec![ValidationFailure {
+                        path: "x".into(),
+                        message: "bad".into(),
+                    }],
                 })
             }
         }

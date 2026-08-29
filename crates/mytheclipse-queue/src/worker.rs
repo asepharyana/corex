@@ -71,10 +71,13 @@ pub struct WorkerPool<Q: Queue + 'static> {
 impl<Q: Queue + 'static> WorkerPool<Q> {
     /// Creates a new worker pool with the given concurrency.
     pub fn new(queue: Q, concurrency: usize) -> Self {
-        Self::with_config(queue, WorkerConfig {
-            concurrency,
-            ..Default::default()
-        })
+        Self::with_config(
+            queue,
+            WorkerConfig {
+                concurrency,
+                ..Default::default()
+            },
+        )
     }
 
     /// Creates a new worker pool with explicit configuration.
@@ -148,8 +151,8 @@ impl<Q: Queue + 'static> WorkerPool<Q> {
 /// Computes the (capped) exponential backoff delay.
 pub fn retry_delay(config: &WorkerConfig, attempt: u32) -> Duration {
     let exponent = attempt as f64;
-    let computed = config.retry_base_delay.as_millis() as f64
-        * config.retry_factor.powf(exponent.max(0.0));
+    let computed =
+        config.retry_base_delay.as_millis() as f64 * config.retry_factor.powf(exponent.max(0.0));
     let capped = computed.min(config.retry_max_delay.as_millis() as f64);
     Duration::from_millis(capped as u64)
 }

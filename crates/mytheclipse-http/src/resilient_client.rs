@@ -77,25 +77,22 @@ impl ResilientHttpClient {
 
     /// Sends a pre-built `RequestBuilder` through the resiliency pipeline.
     /// Returns the response bytes on success.
-    pub async fn send(
-        &self,
-        req: RequestBuilder,
-    ) -> Result<Vec<u8>, RunError<HttpError>> {
+    pub async fn send(&self, req: RequestBuilder) -> Result<Vec<u8>, RunError<HttpError>> {
         let span = tracing::info_span!("resilient_http_send");
         let op = move || {
             let req = req.try_clone().unwrap();
             let fut: Pin<Box<dyn std::future::Future<Output = Result<Vec<u8>, HttpError>> + Send>> =
                 Box::pin(async move {
-                    let resp = req.send().instrument(tracing::trace_span!("http_send")).await?;
+                    let resp = req
+                        .send()
+                        .instrument(tracing::trace_span!("http_send"))
+                        .await?;
                     let bytes = resp.bytes().await?;
                     Ok::<Vec<u8>, HttpError>(bytes.to_vec())
                 });
             fut
         };
-        self.builder
-            .run(op)
-            .instrument(span)
-            .await
+        self.builder.run(op).instrument(span).await
     }
 
     /// Convenience: GET `url`, returning response bytes.

@@ -14,9 +14,7 @@ impl TracingLayer {
     pub fn install() {
         let filter = EnvFilter::try_from_default_env()
             .unwrap_or_else(|_| EnvFilter::new("mytheclipse=info"));
-        let _ = tracing_subscriber::fmt()
-            .with_env_filter(filter)
-            .try_init();
+        let _ = tracing_subscriber::fmt().with_env_filter(filter).try_init();
     }
 
     /// Returns a formatted layer for manual composition.

@@ -26,7 +26,9 @@ impl fmt::Display for HealthStatus {
 /// A single health check.
 pub trait HealthCheck: Send + Sync {
     fn name(&self) -> &str;
-    fn check(&self) -> std::pin::Pin<Box<dyn std::future::Future<Output = HealthStatus> + Send + '_>>;
+    fn check(
+        &self,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = HealthStatus> + Send + '_>>;
 }
 
 /// A registered health check with its name and trait object.

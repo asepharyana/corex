@@ -320,10 +320,19 @@ mod tests {
             ..RetryConfig::default()
         };
         let calls = Cell::new(0u32);
-        let (result, stats) = retry_with_stats(config, |_| true, || async {
-            calls.set(calls.get() + 1);
-            if calls.get() < 3 { Err::<u32, &str>("fail") } else { Ok(42u32) }
-        }).await;
+        let (result, stats) = retry_with_stats(
+            config,
+            |_| true,
+            || async {
+                calls.set(calls.get() + 1);
+                if calls.get() < 3 {
+                    Err::<u32, &str>("fail")
+                } else {
+                    Ok(42u32)
+                }
+            },
+        )
+        .await;
         assert_eq!(result.unwrap(), 42);
         assert_eq!(stats.attempts, 3);
         assert_eq!(stats.retries, 2);

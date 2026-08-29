@@ -24,11 +24,8 @@ impl std::fmt::Display for PipelineError {
 impl std::error::Error for PipelineError {}
 
 /// A single async middleware stage.
-pub type BoxMiddleware<S> = Arc<
-    dyn Fn(S) -> Pin<Box<dyn Future<Output = Result<S, PipelineError>> + Send>>
-        + Send
-        + Sync,
->;
+pub type BoxMiddleware<S> =
+    Arc<dyn Fn(S) -> Pin<Box<dyn Future<Output = Result<S, PipelineError>> + Send>> + Send + Sync>;
 
 /// Helper to box any `async fn` middleware.
 pub fn mw<S, F, Fut>(f: F) -> BoxMiddleware<S>
@@ -48,7 +45,9 @@ pub struct MiddlewarePipeline<S> {
 
 impl<S: Send + 'static> MiddlewarePipeline<S> {
     pub fn new() -> Self {
-        Self { layers: Arc::new(Mutex::new(Vec::new())) }
+        Self {
+            layers: Arc::new(Mutex::new(Vec::new())),
+        }
     }
 
     /// Appends a middleware stage.
@@ -58,7 +57,10 @@ impl<S: Send + 'static> MiddlewarePipeline<S> {
 
     /// Applies every layer in order, short-circuiting on the first error.
     pub async fn apply(&self, state: S) -> Result<S, PipelineError> {
-        let layers = self.layers.lock().unwrap();
+        // Clone the Arc'd layers out so the MutexGuard is dropped before any
+        // await point (holding it across `layer(current).await` is unsound —
+        // a re-entrant layer could deadlock).
+        let layers: Vec<BoxMiddleware<S>> = self.layers.lock().unwrap().clone();
         let mut current = state;
         for layer in layers.iter() {
             current = layer(current).await?;
@@ -100,7 +102,9 @@ mod tests {
     async fn short_circuits_on_error() {
         let p: MiddlewarePipeline<String> = MiddlewarePipeline::new();
         let reject = mw(|_s: String| async {
-            Err::<_, PipelineError>(PipelineError { msg: "rejected".into() })
+            Err::<_, PipelineError>(PipelineError {
+                msg: "rejected".into(),
+            })
         });
         p.add(reject);
         assert!(matches!(p.apply("x".to_string()).await, Err(_)));

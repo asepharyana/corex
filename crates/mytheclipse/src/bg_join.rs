@@ -8,7 +8,6 @@
 //! *concurrency*, `BgJoiner` adds structured *lifetimes* so a service can wait
 //! for all in-flight work to settle before terminating.
 
-use std::future::Future;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -36,7 +35,9 @@ impl BgJoiner {
         F: std::future::Future + Send + 'static,
         F::Output: Send + 'static,
     {
-        let handle: JoinHandle<()> = tokio::spawn(async move { let _ = future.await; });
+        let handle: JoinHandle<()> = tokio::spawn(async move {
+            let _ = future.await;
+        });
         self.track(handle);
     }
 
@@ -55,6 +56,11 @@ impl BgJoiner {
         self.inner.lock().await.len()
     }
 
+    /// Returns `true` if there are no currently-tracked tasks.
+    pub async fn is_empty(&self) -> bool {
+        self.inner.lock().await.is_empty()
+    }
+
     /// Await every tracked task, dropping any that are still pending once
     /// `deadline` elapses. Returns the count of tasks that had not completed
     /// within the timeout.
@@ -66,7 +72,6 @@ impl BgJoiner {
         };
 
         let mut pending: Vec<JoinHandle<()>> = handles;
-        let mut dropped = 0usize;
 
         loop {
             if pending.is_empty() {
@@ -74,11 +79,11 @@ impl BgJoiner {
             }
 
             if now.elapsed() >= deadline {
-                dropped = pending.len();
+                let count = pending.len();
                 for h in pending.drain(..) {
                     h.abort();
                 }
-                return dropped;
+                return count;
             }
 
             let remaining = deadline.saturating_sub(now.elapsed());

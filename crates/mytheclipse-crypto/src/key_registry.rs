@@ -1,6 +1,6 @@
 //! Typed key registry with ID-based lookup (feature `password`).
 //!
-//! [`TypedKeyRegistry`] extends [`KeyRing`] semantics: instead of a single
+//! [`TypedKeyRegistry`] extends `KeyRing` semantics: instead of a single
 //! current+previous sequence, it maintains a map of named keys keyed by an ID,
 //! with one designated "current" ID. This is useful when keys are rotated by ID
 //! (e.g. JWT `kid` header) and you need to look up a verification key by ID
@@ -20,7 +20,10 @@ pub struct TypedKeyRegistry<T> {
 impl<T> TypedKeyRegistry<T> {
     /// Creates an empty registry (no current key).
     pub fn new() -> Self {
-        Self { keys: HashMap::new(), current_id: None }
+        Self {
+            keys: HashMap::new(),
+            current_id: None,
+        }
     }
 
     /// Registers a key under `id`, making it the current key.
@@ -37,9 +40,7 @@ impl<T> TypedKeyRegistry<T> {
 
     /// Returns the current key, if any.
     pub fn current(&self) -> Option<&T> {
-        self.current_id
-            .as_ref()
-            .and_then(|id| self.keys.get(id))
+        self.current_id.as_ref().and_then(|id| self.keys.get(id))
     }
 
     /// Returns the ID of the current key.
