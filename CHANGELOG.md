@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/asepharyana/mytheclipse/compare/v1.14.0...v1.15.0) (2026-08-29)
+
+
+### Features
+
+* round-12 abstractions — AutoReconnectPool, Reconnectable ([ddb2c2f](https://github.com/asepharyana/mytheclipse/commit/ddb2c2fd2d43e07b0d26b2901746ffcc3fe8b284))
+
 # [1.14.0](https://github.com/asepharyana/mytheclipse/compare/v1.13.0...v1.14.0) (2026-08-29)
 
 
