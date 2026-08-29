@@ -1,3 +1,10 @@
+# [1.17.0](https://github.com/asepharyana/mytheclipse/compare/v1.16.0...v1.17.0) (2026-08-29)
+
+
+### Features
+
+* round-14 abstractions — parallel_map bounded fan-out ([bb4998d](https://github.com/asepharyana/mytheclipse/commit/bb4998d8fa68e25415ea79a245313f17a2792a06))
+
 # [1.16.0](https://github.com/asepharyana/mytheclipse/compare/v1.15.0...v1.16.0) (2026-08-29)
 
 
