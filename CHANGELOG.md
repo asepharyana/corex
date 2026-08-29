@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/asepharyana/mytheclipse/compare/v1.9.0...v1.10.0) (2026-08-29)
+
+
+### Features
+
+* round-7 abstractions — BgJoiner, MiddlewarePipeline, RateLimitedQueue ([851c8c4](https://github.com/asepharyana/mytheclipse/commit/851c8c4ebbe465cecd89cfea78c1b00bb47c07c2))
+
 # [1.9.0](https://github.com/asepharyana/mytheclipse/compare/v1.8.0...v1.9.0) (2026-08-29)
 
 
