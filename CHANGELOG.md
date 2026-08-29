@@ -1,3 +1,10 @@
+# [1.20.0](https://github.com/asepharyana/mytheclipse/compare/v1.19.0...v1.20.0) (2026-08-29)
+
+
+### Features
+
+* ParallelConcurrency — auto-size concurrency from CPU cores ([d00881c](https://github.com/asepharyana/mytheclipse/commit/d00881c2b96fa29ee0eaa5f43a7c7af90983e802))
+
 # [1.19.0](https://github.com/asepharyana/mytheclipse/compare/v1.18.0...v1.19.0) (2026-08-29)
 
 
