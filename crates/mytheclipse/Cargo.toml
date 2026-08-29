@@ -43,6 +43,11 @@ name = "main"
 path = "examples/main.rs"
 required-features = ["full"]
 
+[[example]]
+name = "scaling_demo"
+path = "examples/scaling_demo.rs"
+required-features = ["full"]
+
 [[bench]]
 name = "primitives"
 path = "benches/primitives.rs"

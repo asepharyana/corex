@@ -13,6 +13,42 @@ use tokio::sync::Semaphore;
 
 use crate::aggregate_error::AggregateError;
 
+/// Resolves a concurrency hint into an actual bound.
+///
+/// Pass an explicit `usize` for a fixed bound, or `()` to auto-size from the
+/// host CPU (`std::thread::available_parallelism`).
+///
+/// ```
+/// use mytheclipse::parallel_map::{parallel_map, ParallelConcurrency};
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let items = vec![1u32, 2, 3, 4];
+///     let out = parallel_map(items, (), |x| async move { Ok::<_, std::io::Error>(x * 2) })
+///         .await
+///         .unwrap();
+///     assert_eq!(out, vec![2, 4, 6, 8]);
+/// }
+/// ```
+pub trait ParallelConcurrency {
+    /// Turns the hint into a concrete positive concurrency bound.
+    fn resolve(self) -> usize;
+}
+
+impl ParallelConcurrency for usize {
+    fn resolve(self) -> usize {
+        self.max(1)
+    }
+}
+
+impl ParallelConcurrency for () {
+    fn resolve(self) -> usize {
+        std::thread::available_parallelism()
+            .map(|n| n.get())
+            .unwrap_or(1)
+    }
+}
+
 /// Runs `f` over every element of `items`, with at most `concurrency`
 /// futures in flight, and returns the results **in input order**.
 ///
@@ -23,21 +59,25 @@ use crate::aggregate_error::AggregateError;
 /// Note: `items` is fully collected into memory up front (see
 /// [`parallel_for_each`] for a streaming variant that avoids materializing).
 ///
+/// `concurrency` accepts an explicit `usize` or `()` to auto-size from the
+/// host CPU (see [`ParallelConcurrency`]).
+///
 /// ```
 /// use mytheclipse::parallel_map::parallel_map;
 ///
 /// #[tokio::main]
 /// async fn main() {
 ///     let items = vec![1u32, 2, 3, 4, 5];
-///     let doubled = parallel_map(items, 4, |x| async move { Ok::<_, std::io::Error>(x * 2) })
+///     // Auto concurrency: `()` resolved to available_parallelism().
+///     let doubled = parallel_map(items, (), |x| async move { Ok::<_, std::io::Error>(x * 2) })
 ///         .await
 ///         .unwrap();
 ///     assert_eq!(doubled, vec![2, 4, 6, 8, 10]);
 /// }
 /// ```
-pub async fn parallel_map<I, T, F, Fut, E>(
+pub async fn parallel_map<I, T, F, Fut, E, C>(
     items: I,
-    concurrency: usize,
+    concurrency: C,
     f: F,
 ) -> Result<Vec<T>, AggregateError>
 where
@@ -47,9 +87,11 @@ where
     F: Fn(I::Item) -> Fut + Send + Sync + 'static,
     Fut: Future<Output = Result<T, E>> + Send + 'static,
     E: std::error::Error + Send + Sync + 'static,
+    C: ParallelConcurrency,
 {
+    let n = concurrency.resolve();
     let items: Vec<I::Item> = items.into_iter().collect();
-    let sem = Arc::new(Semaphore::new(concurrency.max(1)));
+    let sem = Arc::new(Semaphore::new(n));
     let f = Arc::new(f);
 
     let mut tasks = Vec::with_capacity(items.len());
@@ -83,9 +125,12 @@ where
 /// futures are polled in spawn order here, results come back in input order.
 /// (True completion-order collection would require a `futures` dependency, so
 /// this name is provided for API symmetry and documented as input-ordered.)
-pub async fn parallel_map_unordered<I, T, F, Fut, E>(
+///
+/// `concurrency` accepts an explicit `usize` or `()` to auto-size from the
+/// host CPU (see [`ParallelConcurrency`]).
+pub async fn parallel_map_unordered<I, T, F, Fut, E, C>(
     items: I,
-    concurrency: usize,
+    concurrency: C,
     f: F,
 ) -> Result<Vec<T>, AggregateError>
 where
@@ -95,9 +140,11 @@ where
     F: Fn(I::Item) -> Fut + Send + Sync + 'static,
     Fut: Future<Output = Result<T, E>> + Send + 'static,
     E: std::error::Error + Send + Sync + 'static,
+    C: ParallelConcurrency,
 {
+    let n = concurrency.resolve();
     let items: Vec<I::Item> = items.into_iter().collect();
-    let sem = Arc::new(Semaphore::new(concurrency.max(1)));
+    let sem = Arc::new(Semaphore::new(n));
     let f = Arc::new(f);
 
     let mut tasks = Vec::with_capacity(items.len());
@@ -139,6 +186,9 @@ where
 ///
 /// Errors are aggregated into a single [`AggregateError`].
 ///
+/// `concurrency` accepts an explicit `usize` or `()` to auto-size from the
+/// host CPU (see [`ParallelConcurrency`]).
+///
 /// ```
 /// use std::sync::atomic::{AtomicUsize, Ordering};
 /// use std::sync::Arc;
@@ -148,7 +198,7 @@ where
 /// async fn main() {
 ///     let seen = Arc::new(AtomicUsize::new(0));
 ///     let s = Arc::clone(&seen);
-///     parallel_for_each(0u32..100, 8, move |x| {
+///     parallel_for_each(0u32..100, (), move |x| {
 ///         let s = Arc::clone(&s);
 ///         async move {
 ///             s.fetch_add(x as usize, Ordering::SeqCst);
@@ -160,9 +210,9 @@ where
 ///     assert_eq!(seen.load(Ordering::SeqCst), 4950); // sum 0..100
 /// }
 /// ```
-pub async fn parallel_for_each<I, F, Fut, E>(
+pub async fn parallel_for_each<I, F, Fut, E, C>(
     items: I,
-    concurrency: usize,
+    concurrency: C,
     f: F,
 ) -> Result<(), AggregateError>
 where
@@ -172,10 +222,11 @@ where
     F: Fn(I::Item) -> Fut + Send + Sync + 'static,
     Fut: Future<Output = Result<(), E>> + Send + 'static,
     E: std::error::Error + Send + Sync + 'static,
+    C: ParallelConcurrency,
 {
     use tokio::sync::{mpsc, Mutex};
 
-    let n = concurrency.max(1);
+    let n = concurrency.resolve();
     let (tx, rx) = mpsc::channel::<I::Item>(n * 2);
     let f = Arc::new(f);
     let sem = Arc::new(Semaphore::new(n));
