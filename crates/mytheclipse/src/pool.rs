@@ -94,6 +94,36 @@ pub trait Reconnectable {
 /// [`Reconnectable::is_healthy`]; if unhealthy, a replacement is produced via
 /// [`Reconnectable::reconnect`] and handed back instead. This removes the
 /// per-call-site "is my connection dead? rebuild it" boilerplate.
+///
+/// ```
+/// use mytheclipse::pool::{AutoReconnectPool, Pool, Reconnectable, SemaphorePool};
+/// use mytheclipse::async_trait;
+///
+/// // A "connection" that's dead when its value equals 0.
+/// #[derive(Clone)]
+/// struct Conn { alive: bool }
+/// impl Default for Conn { fn default() -> Self { Self { alive: true } } }
+///
+/// #[derive(Default)]
+/// struct ConnReconnector;
+///
+/// #[async_trait]
+/// impl Reconnectable for ConnReconnector {
+///     type Item = Conn;
+///     fn is_healthy(&self, c: &Conn) -> bool { c.alive }
+///     async fn reconnect(&self) -> Result<Conn, Box<dyn std::error::Error + Send + Sync>> {
+///         Ok(Conn::default())
+///     }
+/// }
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let pool = SemaphorePool::new(vec![Conn { alive: false }, Conn::default()]);
+///     let pool = AutoReconnectPool::new(pool, ConnReconnector);
+///     let first = pool.acquire().await.unwrap();
+///     assert!(first.resource.alive); // dead one was transparently replaced
+/// }
+/// ```
 pub struct AutoReconnectPool<P, R> {
     inner: P,
     reconnect: R,

@@ -10,6 +10,27 @@
 use std::fmt;
 
 /// An error that groups one or more underlying errors.
+///
+/// ```
+/// use mytheclipse::aggregate_error::AggregateError;
+///
+/// // Collect errors from N parallel results — all of them, not just the first:
+/// let results = vec![
+///     Ok::<_, std::io::Error>(1),
+///     Err(std::io::Error::other("boom")),
+///     Ok::<_, std::io::Error>(3),
+///     Err(std::io::Error::other("bam")),
+/// ];
+/// let out = AggregateError::from_results(results);
+/// let err = out.unwrap_err();
+/// assert_eq!(err.len(), 2); // both errors collected
+///
+/// // Build one incrementally too:
+/// let mut agg = AggregateError::with_context("fan-out");
+/// agg.push(std::io::Error::other("first"));
+/// agg.push(std::io::Error::other("second"));
+/// assert_eq!(agg.len(), 2);
+/// ```
 #[derive(Debug)]
 pub struct AggregateError {
     errors: Vec<Box<dyn std::error::Error + Send + Sync>>,

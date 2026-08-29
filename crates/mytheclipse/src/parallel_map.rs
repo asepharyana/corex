@@ -22,6 +22,19 @@ use crate::aggregate_error::AggregateError;
 ///
 /// Note: `items` is fully collected into memory up front (see
 /// [`parallel_for_each`] for a streaming variant that avoids materializing).
+///
+/// ```
+/// use mytheclipse::parallel_map::parallel_map;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let items = vec![1u32, 2, 3, 4, 5];
+///     let doubled = parallel_map(items, 4, |x| async move { Ok::<_, std::io::Error>(x * 2) })
+///         .await
+///         .unwrap();
+///     assert_eq!(doubled, vec![2, 4, 6, 8, 10]);
+/// }
+/// ```
 pub async fn parallel_map<I, T, F, Fut, E>(
     items: I,
     concurrency: usize,
@@ -125,6 +138,28 @@ where
 /// task and never gets ahead.
 ///
 /// Errors are aggregated into a single [`AggregateError`].
+///
+/// ```
+/// use std::sync::atomic::{AtomicUsize, Ordering};
+/// use std::sync::Arc;
+/// use mytheclipse::parallel_map::parallel_for_each;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let seen = Arc::new(AtomicUsize::new(0));
+///     let s = Arc::clone(&seen);
+///     parallel_for_each(0u32..100, 8, move |x| {
+///         let s = Arc::clone(&s);
+///         async move {
+///             s.fetch_add(x as usize, Ordering::SeqCst);
+///             Ok::<_, std::io::Error>(())
+///         }
+///     })
+///     .await
+///     .unwrap();
+///     assert_eq!(seen.load(Ordering::SeqCst), 4950); // sum 0..100
+/// }
+/// ```
 pub async fn parallel_for_each<I, F, Fut, E>(
     items: I,
     concurrency: usize,

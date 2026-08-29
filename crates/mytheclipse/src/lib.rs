@@ -128,6 +128,10 @@ pub use backpressure::{BackpressureError, BackpressureQueue, OverflowPolicy};
 pub use concurrency::{ConcurrencyLimiter, ConcurrencyPermit};
 #[cfg(feature = "traffic")]
 pub use pool::{Pool, PoolError, Pooled, SemaphorePool, AutoReconnectPool, Reconnectable};
+/// Re-export of `async-trait` so implementing [`pool::Reconnectable`] (and
+/// other async traits) doesn't require users to add their own `async-trait`
+/// dependency.
+pub use async_trait::async_trait;
 
 #[cfg(feature = "lifecycle")]
 pub use shutdown::{ShutdownManager, ShutdownSignal};

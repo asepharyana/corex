@@ -19,6 +19,22 @@ use crate::metrics::MetricsCollector;
 use crate::service_builder::{RunError, ServiceBuilder, ServiceConfig};
 
 /// A [`ServiceBuilder`] wrapper that auto-records latency and outcome metrics.
+///
+/// ```
+/// use std::time::Duration;
+/// use mytheclipse::auto_metrics_service::AutoMetricsServiceBuilder;
+/// use mytheclipse::service_builder::ServiceConfig;
+///
+/// let cfg = ServiceConfig {
+///     max_attempts: 2,
+///     timeout: Duration::from_millis(1),
+///     ..ServiceConfig::default()
+/// };
+/// let svc = AutoMetricsServiceBuilder::new("checkout", cfg);
+/// // Every `.run()` call now auto-records outcome + latency on the shared
+/// // MetricsCollector (retrievable via `collector()`).
+/// let _ = svc.collector();
+/// ```
 pub struct AutoMetricsServiceBuilder {
     inner: ServiceBuilder,
     metrics: MetricsCollector,

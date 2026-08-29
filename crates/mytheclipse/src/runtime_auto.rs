@@ -20,6 +20,22 @@ use std::num::NonZeroUsize;
 ///
 /// Each field is a concrete `usize` (never zero) so it can be fed directly
 /// into a tokio/rayon/std-thread builder with no further `max(1)` guards.
+///
+/// ```
+/// use mytheclipse::runtime_auto::RuntimeConfig;
+///
+/// let cfg = RuntimeConfig::auto();      // from the host CPU
+/// let sized = RuntimeConfig::from_cores(4); // or explicit
+///
+/// // Feed straight into a tokio builder:
+/// let rt = tokio::runtime::Builder::new_multi_thread()
+///     .worker_threads(cfg.worker_threads)
+///     .max_blocking_threads(cfg.max_blocking_threads)
+///     .build()
+///     .unwrap();
+/// let _ = sized.compute_threads;
+/// rt.shutdown_timeout(std::time::Duration::from_millis(1));
+/// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeConfig {
     /// Worker threads for the main async runtime (default: one per core).

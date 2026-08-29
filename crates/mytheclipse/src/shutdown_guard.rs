@@ -18,6 +18,25 @@ use std::sync::{Arc, Mutex};
 /// The callback is wrapped in a `Mutex<Option<_>>` so it can be taken out and
 /// run exactly once — even on a `panic!`-unwound drop — guaranteeing at-most-
 /// once semantics (no double-shutdown race).
+///
+/// ```
+/// use std::sync::atomic::{AtomicUsize, Ordering};
+/// use std::sync::Arc;
+/// use mytheclipse::shutdown_guard::ShutdownGuard;
+///
+/// let done = Arc::new(AtomicUsize::new(0));
+/// let d = Arc::clone(&done);
+/// {
+///     let _guard = ShutdownGuard::new(move || { d.fetch_add(1, Ordering::SeqCst); });
+///     // do work...
+/// } // guard dropped here -> callback fires exactly once
+/// assert_eq!(done.load(Ordering::SeqCst), 1);
+///
+/// // Or fire early with `finish()` (disarms the drop):
+/// let d2 = Arc::clone(&done);
+/// ShutdownGuard::new(move || { d2.fetch_add(1, Ordering::SeqCst); }).finish();
+/// assert_eq!(done.load(Ordering::SeqCst), 2);
+/// ```
 pub struct ShutdownGuard {
     inner: Arc<Mutex<Option<Box<dyn FnOnce() + Send>>>>,
 }
