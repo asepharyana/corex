@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/asepharyana/mytheclipse/compare/v1.8.0...v1.9.0) (2026-08-29)
+
+
+### Features
+
+* round-6 abstractions — HealthCheckedPool, HkdfKeyDeriver, BackpressureEnforcer ([a03db38](https://github.com/asepharyana/mytheclipse/commit/a03db38c5ccabead51fa49d2001b0cd94a9dd66e))
+
 # [1.8.0](https://github.com/asepharyana/mytheclipse/compare/v1.7.0...v1.8.0) (2026-08-29)
 
 
