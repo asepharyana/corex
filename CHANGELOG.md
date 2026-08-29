@@ -1,3 +1,10 @@
+# [1.18.0](https://github.com/asepharyana/mytheclipse/compare/v1.17.0...v1.18.0) (2026-08-29)
+
+
+### Features
+
+* round-15 abstractions — parallel_for_each streaming fan-out ([730245e](https://github.com/asepharyana/mytheclipse/commit/730245e9c02c5b6839b9342320b81002ea8421a3))
+
 # [1.17.0](https://github.com/asepharyana/mytheclipse/compare/v1.16.0...v1.17.0) (2026-08-29)
 
 
