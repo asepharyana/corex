@@ -36,7 +36,11 @@ pub mod retry;
 #[cfg(feature = "resiliency")]
 pub mod retry_ext;
 #[cfg(feature = "resiliency")]
+pub mod aggregate_error;
+#[cfg(feature = "resiliency")]
 pub use retry_ext::RetryExt;
+#[cfg(feature = "resiliency")]
+pub use aggregate_error::AggregateError;
 #[cfg(feature = "observability")]
 pub mod auto_metrics_service;
 #[cfg(feature = "observability")]
