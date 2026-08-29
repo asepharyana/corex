@@ -55,6 +55,11 @@ pub mod traits;
 pub mod worker;
 
 #[cfg(feature = "in-memory")]
+pub mod batch;
+#[cfg(feature = "in-memory")]
+pub mod pipeline;
+
+#[cfg(feature = "in-memory")]
 pub use in_memory::InMemoryQueue;
 
 pub use traits::Queue;
@@ -63,6 +68,6 @@ pub use worker::{WorkerPool, WorkerConfig, JobHandler, JobFuture};
 pub use error::{QueueError, JobError};
 
 #[cfg(feature = "in-memory")]
-pub mod pipeline;
+pub use batch::{BatchConfig, BatchJobHandler, BatchProcessor, BatchFlush};
 #[cfg(feature = "in-memory")]
 pub use pipeline::{StageRunner, Stage, StageError};
