@@ -34,7 +34,7 @@ serde_json = { version = "1", optional = true }
 moka = { version = "0.12", default-features = false, features = ["future"], optional = true }
 
 # L2: Redis/Valkey async client (multiplexed connection).
-redis = { version = "0.27", default-features = false, features = ["tokio-comp"], optional = true }
+redis = { version = "0.32", default-features = false, features = ["tokio-comp"], optional = true }
 tokio = { version = "1.53", features = ["sync", "rt"], optional = true }
 
 [dev-dependencies]
