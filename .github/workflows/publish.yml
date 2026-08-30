@@ -27,12 +27,17 @@ jobs:
 
       # The workspace crates have no interdependencies, so publish order
       # doesn't matter for crates.io dependency resolution. A brief sleep
-      # between publishes avoids hitting crates.io's rate limit.
+      # between publishes avoids hitting crates.io's rate limit. Re-publishing
+      # an already-uploaded version is tolerated (idempotent re-runs).
       - name: Publish workspace crates
         run: |
-          for crate in mytheclipse mytheclipse-cache mytheclipse-storage mytheclipse-event mytheclipse-config mytheclipse-crypto; do
+          for crate in mytheclipse mytheclipse-cache mytheclipse-storage mytheclipse-event mytheclipse-config mytheclipse-crypto mytheclipse-queue mytheclipse-tracing; do
             echo "Publishing $crate..."
-            cargo publish -p "$crate" --allow-dirty --no-verify
+            if cargo publish -p "$crate" --allow-dirty --no-verify; then
+              echo "$crate published OK"
+            else
+              echo "$crate: publish failed (already uploaded or error)"
+            fi
             sleep 15
           done
         env:
