@@ -1,3 +1,10 @@
+## [1.21.2](https://github.com/asepharyana/mytheclipse/compare/v1.21.1...v1.21.2) (2026-08-30)
+
+
+### Bug Fixes
+
+* **cache:** align redis dep to 0.32 for deadpool unification ([901fc51](https://github.com/asepharyana/mytheclipse/commit/901fc51f7b3bf4b2ab433db2e35303722778cc76))
+
 ## [1.21.1](https://github.com/asepharyana/mytheclipse/compare/v1.21.0...v1.21.1) (2026-08-29)
 
 

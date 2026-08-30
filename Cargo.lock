@@ -2941,7 +2941,7 @@ dependencies = [
 
 [[package]]
 name = "mytheclipse"
-version = "1.21.1"
+version = "1.21.2"
 dependencies = [
  "async-trait",
  "criterion",
@@ -2956,11 +2956,11 @@ dependencies = [
 
 [[package]]
 name = "mytheclipse-cache"
-version = "1.21.1"
+version = "1.21.2"
 dependencies = [
  "async-trait",
  "moka",
- "redis",
+ "redis 0.32.7",
  "serde",
  "serde_json",
  "tokio",
@@ -2969,7 +2969,7 @@ dependencies = [
 
 [[package]]
 name = "mytheclipse-cli"
-version = "1.21.1"
+version = "1.21.2"
 dependencies = [
  "clap",
  "tokio",
@@ -2978,7 +2978,7 @@ dependencies = [
 
 [[package]]
 name = "mytheclipse-config"
-version = "1.21.1"
+version = "1.21.2"
 dependencies = [
  "dotenvy",
  "notify",
@@ -2993,7 +2993,7 @@ dependencies = [
 
 [[package]]
 name = "mytheclipse-crypto"
-version = "1.21.1"
+version = "1.21.2"
 dependencies = [
  "aead",
  "aes-gcm",
@@ -3015,7 +3015,7 @@ dependencies = [
 
 [[package]]
 name = "mytheclipse-event"
-version = "1.21.1"
+version = "1.21.2"
 dependencies = [
  "async-nats",
  "async-trait",
@@ -3031,7 +3031,7 @@ dependencies = [
 
 [[package]]
 name = "mytheclipse-http"
-version = "1.21.1"
+version = "1.21.2"
 dependencies = [
  "async-trait",
  "axum",
@@ -3047,12 +3047,12 @@ dependencies = [
 
 [[package]]
 name = "mytheclipse-queue"
-version = "1.21.1"
+version = "1.21.2"
 dependencies = [
  "async-nats",
  "async-trait",
  "bytes",
- "redis",
+ "redis 0.27.6",
  "serde",
  "serde_json",
  "tokio",
@@ -3063,7 +3063,7 @@ dependencies = [
 
 [[package]]
 name = "mytheclipse-storage"
-version = "1.21.1"
+version = "1.21.2"
 dependencies = [
  "async-trait",
  "aws-config",
@@ -3079,7 +3079,7 @@ dependencies = [
 
 [[package]]
 name = "mytheclipse-tracing"
-version = "1.21.1"
+version = "1.21.2"
 dependencies = [
  "opentelemetry 0.25.0",
  "tokio",
@@ -3981,6 +3981,27 @@ dependencies = [
  "percent-encoding",
  "pin-project-lite",
  "ryu",
+ "tokio",
+ "tokio-util",
+ "url",
+]
+
+[[package]]
+name = "redis"
+version = "0.32.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "014cc767fefab6a3e798ca45112bccad9c6e0e218fbd49720042716c73cfef44"
+dependencies = [
+ "bytes",
+ "cfg-if",
+ "combine",
+ "futures-util",
+ "itoa",
+ "num-bigint",
+ "percent-encoding",
+ "pin-project-lite",
+ "ryu",
+ "socket2 0.6.5",
  "tokio",
  "tokio-util",
  "url",
